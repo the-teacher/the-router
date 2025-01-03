@@ -37,7 +37,7 @@ pnpm add the-router
 `routes/index.ts`
 
 ```ts
-import { root, get, post, getRouter } from "the-router";
+import { root, get, post, getRouter, routeScope as scope } from "the-router";
 
 // Определение корневого маршрута
 root("index#index");  // Использует src/actions/index/indexAction.ts
@@ -45,11 +45,17 @@ root("index#index");  // Использует src/actions/index/indexAction.ts
 // Определение GET и POST маршрутов
 get("/users", "users#show");    // Использует src/actions/users/showAction.ts
 post("/users", "users#create"); // Использует src/actions/users/createAction.ts
+
+// Определение сгруппированных маршрутов
+scope("admin", () => {
+  get("/users", "users#create");    // Использует src/actions/admin/users/createAction.ts
+  post("/users", "users#update");   // Использует src/actions/admin/users/updateAction.ts
+});
 ```
 
 ### Структура файлов действий
 
-Каждое действие определяется в своём собственном файле:
+Каждое действие определяется в своём собственном файле и **должно экспортировать функцию `perform`**:
 
 ```bash
 src/
@@ -70,6 +76,7 @@ src/
 // src/actions/users/showAction.ts
 import { Request, Response } from "express";
 
+// perform - обязательный метод для каждого действия
 export const perform = (req: Request, res: Response) => {
   res.json({ message: "Список пользователей" });
 };

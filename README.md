@@ -37,7 +37,7 @@ pnpm add the-router
 `routes/index.ts`
 
 ```ts
-import { root, get, post, getRouter } from "the-router";
+import { root, get, post, routerScope as scope } from "the-router";
 
 // Define root route
 root("index#index");  // Will use src/actions/index/indexAction.ts
@@ -45,6 +45,12 @@ root("index#index");  // Will use src/actions/index/indexAction.ts
 // Define GET and POST routes
 get("/users", "users#show");    // Will use src/actions/users/showAction.ts
 post("/users", "users#create"); // Will use src/actions/users/createAction.ts
+
+// Define GET and POST routes
+scope("admin", () => {
+  get("/users", "users#create");    // Will use src/actions/admin/users/createAction.ts
+  post("/users", "users#update");   // Will use src/actions/admin/users/updateAction.ts
+});
 ```
 
 ### Action Files Structure
@@ -55,13 +61,14 @@ Each action is defined in its own file:
 src/
   actions/
     index/
-      indexAction.ts    # handles root("index#index")
+      indexAction.ts    # handles get "/"
     users/
-      showAction.ts     # handles get("/users", "users#show")
-      createAction.ts   # handles post("/users", "users#create")
+      showAction.ts     # handles get "/users"
+      createAction.ts   # handles post "/users"
     admin/
       users/
-        listAction.ts   # handles get("/users", "admin/users#list") in admin scope
+        createAction.ts   # handles get "/admin/users"
+        updateAction.ts   # handles post "/admin/users"
 ```
 
 Action file example:
@@ -71,21 +78,21 @@ Action file example:
 import { Request, Response } from "express";
 
 export const perform = (req: Request, res: Response) => {
-  res.json({ message: "Список пользователей" });
+  res.json({ message: "Users list" });
 };
 ```
 
-### Структура файлов действий
+### Action Files Structure
 
-Каждое действие определяется в своём собственном файле и **должно экспортировать функцию `perform`**:
+Each action is defined in its own file and **must export a `perform` function**:
 
 ```typescript
 // src/actions/users/showAction.ts
 import { Request, Response } from "express";
 
-// perform - обязательный метод для каждого действия
+// perform - required method for each action
 export const perform = (req: Request, res: Response) => {
-  res.json({ message: "Список пользователей" });
+  res.json({ message: "Users list" });
 };
 ```
 
@@ -204,7 +211,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:4000"],
     credentials: true,
   })
 );
