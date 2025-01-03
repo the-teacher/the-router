@@ -1,4 +1,4 @@
-name: miniframe_router
+name: the_router
 
 services:
   app:

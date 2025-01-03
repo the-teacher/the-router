@@ -5,7 +5,7 @@ import {
   routeScope as scope,
   getRouter,
   setRouterCotrollersPath,
-} from "miniframe-router";
+} from "the-router";
 
 import { authenticate } from "../middlewares/auth";
 import { validatePost } from "../middlewares/validation";

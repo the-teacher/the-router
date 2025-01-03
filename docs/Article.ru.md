@@ -1,6 +1,6 @@
 ## Роутер для Express.JS приложений
 
-**[miniframe-router](https://www.npmjs.com/package/miniframe-router)** — минималистичный роутер для Express.JS приложений в стиле Ruby on Rails и как я его сделал.
+**[the-router](https://www.npmjs.com/package/the-router)** — минималистичный роутер для Express.JS приложений в стиле Ruby on Rails и как я его сделал.
 
 ![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/p5t1zaooq2323t3sxf37.png)
 
@@ -52,7 +52,7 @@ import {
   post,
   routeScope as scope,
   getRouter,
-} from "miniframe-router";
+} from "the-router";
 
 // Root routes
 root("index#home");
@@ -184,15 +184,15 @@ export const destroy = (req: Request, res: Response) => {
 
 #### Для проектов какого размера можно использовать?
 
-- **`miniframe-router`** подходит для приложений с десятками роутов. Ограничений по размеру нет.
+- **`the-router`** подходит для приложений с десятками роутов. Ограничений по размеру нет.
 
 ---
 
 ## Итог
 
-Код проекта и документация: [GitHub - miniframe-router](https://github.com/the-teacher)
+Код проекта и документация: [GitHub - the-router](https://github.com/the-teacher)
 
-NPM пакет: [miniframe-router](https://www.npmjs.com/package/miniframe-router)
+NPM пакет: [the-router](https://www.npmjs.com/package/the-router)
 
 Лайк, шер, репост и подписка приветствуются. Конструктивный фидбек всегда ценен!
 

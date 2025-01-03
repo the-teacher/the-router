@@ -82,4 +82,4 @@ npm_bump_major:
 	make down
 
 npm_unpublish:
-	npm unpublish miniframe-router@1.1.0
+	npm unpublish the-router@1.1.0

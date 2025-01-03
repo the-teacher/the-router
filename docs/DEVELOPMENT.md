@@ -11,7 +11,7 @@
 ### 1. Clone the project
 
 ```bash
-git clone https://github.com/the-teacher/miniframe-router.git
+git clone https://github.com/the-teacher/the-router.git
 ```
 
 ### 2. Run test in container
@@ -28,8 +28,8 @@ make up
 docker-compose up -d
 
 [+] Running 2/2
- ✔ Network miniframe_router_default  Created                                                                                                              0.0s
- ✔ Container miniframe_router-app-1  Started                                                                                                              0.3s
+ ✔ Network the_router_default  Created                                                                                                              0.0s
+ ✔ Container the_router-app-1  Started                                                                                                              0.3s
 make install
 docker-compose exec app yarn install
 yarn install v1.22.22
@@ -53,8 +53,8 @@ Done in 3.34s.
 make down
 docker-compose down
 [+] Running 2/1
- ✔ Container miniframe_router-app-1  Removed                                                                                                             10.1s
- ✔ Network miniframe_router_default  Removed
+ ✔ Container the_router-app-1  Removed                                                                                                             10.1s
+ ✔ Network the_router_default  Removed
 ```
 
 ## Get into the container
@@ -62,7 +62,7 @@ docker-compose down
 ### 1. Clone the project
 
 ```bash
-git clone https://github.com/the-teacher/miniframe-router.git
+git clone https://github.com/the-teacher/the-router.git
 ```
 
 ### 2. Run the shell

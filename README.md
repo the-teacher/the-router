@@ -1,4 +1,4 @@
-# `MiniframeJS/Router`
+# `The Router`
 
 A simple yet powerful routing solution for `Express.js` applications that provides a clean and intuitive way to organize routes and actions.
 
@@ -19,15 +19,15 @@ A simple yet powerful routing solution for `Express.js` applications that provid
 ## Installation
 
 ```bash
-npm install miniframe-router
+npm install the-router
 ```
 
 ```bash
-yarn add miniframe-router
+yarn add the-router
 ```
 
 ```bash
-pnpm add miniframe-router
+pnpm add the-router
 ```
 
 ## Usage
@@ -37,7 +37,7 @@ pnpm add miniframe-router
 `routes/index.ts`
 
 ```ts
-import { root, get, post, getRouter } from "miniframe-router";
+import { root, get, post, getRouter } from "the-router";
 
 // Define root route
 root("index#index");  // Will use src/actions/index/indexAction.ts
@@ -49,7 +49,7 @@ post("/users", "users#create"); // Will use src/actions/users/createAction.ts
 
 ### Action Files Structure
 
-Each action is defined in its own file and **must export a `perform` function**:
+Each action is defined in its own file:
 
 ```bash
 src/
@@ -70,9 +70,8 @@ Action file example:
 // src/actions/users/showAction.ts
 import { Request, Response } from "express";
 
-// perform is a required method for each action
 export const perform = (req: Request, res: Response) => {
-  res.json({ message: "List of users" });
+  res.json({ message: "Список пользователей" });
 };
 ```
 
@@ -106,7 +105,7 @@ scope("admin", () => {
 You can add middleware to any route:
 
 ```ts
-import { get, post, routeScope as scope } from "miniframe-router";
+import { get, post, routeScope as scope } from "the-router";
 
 import { authenticate } from "./middlewares/auth";
 import { validateUser } from "./middlewares/validation";
@@ -232,7 +231,7 @@ import {
   post,
   getRouter,
   routeScope as scope,
-} from "miniframe-router";
+} from "the-router";
 
 // Root route
 root("index#index");  // -> src/actions/index/indexAction.ts

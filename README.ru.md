@@ -1,4 +1,4 @@
-# `MiniframeJS/Router`
+# `The Router`
 
 Простое и мощное решение для маршрутизации в приложениях на `Express.js`, которое предоставляет чистый и интуитивно понятный способ организации маршрутов и действий.
 
@@ -19,15 +19,15 @@
 ## Установка
 
 ```bash
-npm install miniframe-router
+npm install the-router
 ```
 
 ```bash
-yarn add miniframe-router
+yarn add the-router
 ```
 
 ```bash
-pnpm add miniframe-router
+pnpm add the-router
 ```
 
 ## Использование
@@ -37,7 +37,7 @@ pnpm add miniframe-router
 `routes/index.ts`
 
 ```ts
-import { root, get, post, getRouter } from "miniframe-router";
+import { root, get, post, getRouter } from "the-router";
 
 // Определение корневого маршрута
 root("index#index");  // Использует src/actions/index/indexAction.ts
@@ -49,7 +49,7 @@ post("/users", "users#create"); // Использует src/actions/users/create
 
 ### Структура файлов действий
 
-Каждое действие определяется в своём собственном файле и **должно экспортировать функцию `perform`**:
+Каждое действие определяется в своём собственном файле:
 
 ```bash
 src/
@@ -70,9 +70,8 @@ src/
 // src/actions/users/showAction.ts
 import { Request, Response } from "express";
 
-// perform is a required method for each action
 export const perform = (req: Request, res: Response) => {
-  res.json({ message: "List of users" });
+  res.json({ message: "Список пользователей" });
 };
 ```
 
@@ -213,7 +212,7 @@ import {
   post,
   getRouter,
   routeScope as scope,
-} from "miniframe-router";
+} from "the-router";
 
 // Корневой маршрут
 root("index#index");  // -> src/actions/index/indexAction.ts
