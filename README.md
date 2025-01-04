@@ -19,15 +19,15 @@ A simple yet powerful routing solution for `Express.js` applications that provid
 ## Installation
 
 ```bash
-npm install the-router
+npm install @the-teacher/the-router
 ```
 
 ```bash
-yarn add the-router
+yarn add @the-teacher/the-router
 ```
 
 ```bash
-pnpm add the-router
+pnpm add @the-teacher/the-router
 ```
 
 ## Usage
@@ -37,19 +37,19 @@ pnpm add the-router
 `routes/index.ts`
 
 ```ts
-import { root, get, post, routerScope as scope } from "the-router";
+import { root, get, post, routerScope as scope } from "@the-teacher/the-router";
 
 // Define root route
-root("index#index");  // Will use src/actions/index/indexAction.ts
+root("index#index"); // Will use src/actions/index/indexAction.ts
 
 // Define GET and POST routes
-get("/users", "users#show");    // Will use src/actions/users/showAction.ts
+get("/users", "users#show"); // Will use src/actions/users/showAction.ts
 post("/users", "users#create"); // Will use src/actions/users/createAction.ts
 
 // Define GET and POST routes
 scope("admin", () => {
-  get("/users", "users#create");    // Will use src/actions/admin/users/createAction.ts
-  post("/users", "users#update");   // Will use src/actions/admin/users/updateAction.ts
+  get("/users", "users#create"); // Will use src/actions/admin/users/createAction.ts
+  post("/users", "users#update"); // Will use src/actions/admin/users/updateAction.ts
 });
 ```
 
@@ -102,7 +102,7 @@ Group related routes under a common prefix:
 
 ```ts
 scope("admin", () => {
-  get("/users", "admin/users#list");   // Will use src/actions/admin/users/listAction.ts
+  get("/users", "admin/users#list"); // Will use src/actions/admin/users/listAction.ts
   post("/users", "admin/users#create"); // Will use src/actions/admin/users/createAction.ts
 });
 ```
@@ -112,7 +112,7 @@ scope("admin", () => {
 You can add middleware to any route:
 
 ```ts
-import { get, post, routeScope as scope } from "the-router";
+import { get, post, routeScope as scope } from "@the-teacher/the-router";
 
 import { authenticate } from "./middlewares/auth";
 import { validateUser } from "./middlewares/validation";
@@ -206,25 +206,26 @@ src/
 Example of routes matching this structure:
 
 ```ts
-import { root, get, post, routeScope as scope } from "the-router";
+import { root, get, post, routeScope as scope } from "@the-teacher/the-router";
 
 // Root and basic routes
-root("index#index");              // -> src/actions/index/indexAction.ts
-get("/users", "users#show");      // -> src/actions/users/showAction.ts
-post("/users", "users#create");   // -> src/actions/users/createAction.ts
-get("/posts", "posts#show");      // -> src/actions/posts/showAction.ts
-post("/posts", "posts#create");   // -> src/actions/posts/createAction.ts
+root("index#index"); // -> src/actions/index/indexAction.ts
+get("/users", "users#show"); // -> src/actions/users/showAction.ts
+post("/users", "users#create"); // -> src/actions/users/createAction.ts
+get("/posts", "posts#show"); // -> src/actions/posts/showAction.ts
+post("/posts", "posts#create"); // -> src/actions/posts/createAction.ts
 
 // Admin scope
 scope("admin", () => {
-  get("/users", "users#list");     // -> src/actions/admin/users/listAction.ts
-  post("/users", "users#create");  // -> src/actions/admin/users/createAction.ts
-  get("/posts", "posts#list");     // -> src/actions/admin/posts/listAction.ts
-  post("/posts", "posts#update");  // -> src/actions/admin/posts/updateAction.ts
+  get("/users", "users#list"); // -> src/actions/admin/users/listAction.ts
+  post("/users", "users#create"); // -> src/actions/admin/users/createAction.ts
+  get("/posts", "posts#list"); // -> src/actions/admin/posts/listAction.ts
+  post("/posts", "posts#update"); // -> src/actions/admin/posts/updateAction.ts
 });
 ```
 
 This will create routes:
+
 - GET `/` -> `src/actions/index/indexAction.ts`
 - GET `/users` -> `src/actions/users/showAction.ts`
 - POST `/users` -> `src/actions/users/createAction.ts`
@@ -241,8 +242,8 @@ Group related routes under a common prefix:
 
 ```ts
 scope("admin", () => {
-  get("/users", "users#list");     // -> src/actions/admin/users/listAction.ts
-  post("/users", "users#create");  // -> src/actions/admin/users/createAction.ts
+  get("/users", "users#list"); // -> src/actions/admin/users/listAction.ts
+  post("/users", "users#create"); // -> src/actions/admin/users/createAction.ts
 });
 ```
 
@@ -252,7 +253,7 @@ Routes can include dynamic parameters:
 
 ```ts
 // Basic parameter routes
-get("/users/:id", "users#show");           // -> /users/123
+get("/users/:id", "users#show"); // -> /users/123
 get("/posts/:id/comments", "posts#comments"); // -> /posts/456/comments
 
 // Parameters with middleware
@@ -268,12 +269,12 @@ The order of route definitions matters. More specific routes should be defined b
 
 ```ts
 // ✅ Correct order
-get("/posts/featured", "posts#featured");  // More specific route first
-get("/posts/:id", "posts#show");          // General route second
+get("/posts/featured", "posts#featured"); // More specific route first
+get("/posts/:id", "posts#show"); // General route second
 
 // ❌ Wrong order - "/posts/featured" will never be reached
-get("/posts/:id", "posts#show");          // General route catches all
-get("/posts/featured", "posts#featured");  // Will never match
+get("/posts/:id", "posts#show"); // General route catches all
+get("/posts/featured", "posts#featured"); // Will never match
 ```
 
 ### Middleware Organization
@@ -293,7 +294,7 @@ post("/users", [...authMiddlewares, ...validationMiddlewares], "users#create");
 const adminMiddlewares = [authenticate, requireAdmin, logAccess];
 scope("admin", adminMiddlewares, () => {
   get("/users", "users#list");
-  
+
   // Additional middleware for specific routes
   const userUpdateMiddlewares = [validateUser];
   post("/users/:id", userUpdateMiddlewares, "users#update");
@@ -303,6 +304,7 @@ scope("admin", adminMiddlewares, () => {
 ### API Reference
 
 Basic usage:
+
 - `root(scopeAction)`: Define root route (`/`)
 - `get(path, scopeAction)`: Define GET route
 - `post(path, scopeAction)`: Define POST route
@@ -315,6 +317,7 @@ Basic usage:
 - `scope(prefix, callback)`: Group routes under a common prefix
 
 With middleware:
+
 - `root(middlewares[], scopeAction)`: Define root route with middleware
 - `get(path, middlewares[], scopeAction)`: Define GET route with middleware
 - `post(path, middlewares[], scopeAction)`: Define POST route with middleware
@@ -327,6 +330,7 @@ With middleware:
 - `scope(prefix, middlewares[], callback)`: Group routes with middleware
 
 Examples:
+
 ```ts
 // Basic usage
 root("index#index");
@@ -338,30 +342,35 @@ destroy("/users/:id", "users#delete");
 options("/users", "users#options");
 head("/users", "users#head");
 all("/api", "api#handle");
-scope("admin", () => { /* routes */ });
+scope("admin", () => {
+  /* routes */
+});
 
 // With middleware
 const authMiddlewares = [authenticate, logRequest];
 root([authenticate], "index#index");
 get("/users", authMiddlewares, "users#show");
 put("/users/:id", authMiddlewares, "users#update");
-scope("admin", authMiddlewares, () => { /* routes */ });
+scope("admin", authMiddlewares, () => {
+  /* routes */
+});
 ```
+
 ### Routes with Regular Expressions
 
 You can use regular expressions for route paths:
 
 ```ts
 // Match paths ending with 'fly'
-get(/.*fly$/, "insects#list");           // Matches: /butterfly, /dragonfly
+get(/.*fly$/, "insects#list"); // Matches: /butterfly, /dragonfly
 get(/^\/api\/v\d+\/.*$/, "api#handle"); // Matches: /api/v1/users, /api/v2/posts
 
 // RegExp routes with middleware
 get(/^\/secure\/.*$/, [authenticate], "secure#handle");
 
 // Order matters for RegExp routes too
-get(/^\/api\/v1\/users$/, "users#list");  // More specific route first
-get(/^\/api\/v1\/.*$/, "api#handle");     // General route second
+get(/^\/api\/v1\/users$/, "users#list"); // More specific route first
+get(/^\/api\/v1\/.*$/, "api#handle"); // General route second
 ```
 
 Note: When using regular expressions, the path is passed to `Express.js` as is, without any normalization.
@@ -375,6 +384,7 @@ resources("posts");
 ```
 
 This will create the following routes:
+
 - `GET /posts` -> `src/actions/posts/indexAction.ts`
 - `GET /posts/new` -> `src/actions/posts/newAction.ts`
 - `POST /posts` -> `src/actions/posts/createAction.ts`
@@ -395,12 +405,13 @@ Resources can also be scoped:
 
 ```ts
 scope("admin", [authenticate], () => {
-  resources("posts");  // Routes will be prefixed with /admin
+  resources("posts"); // Routes will be prefixed with /admin
   resources("users"); // Routes will be prefixed with /admin
 });
 ```
 
 This creates routes like `/admin/posts`, `/admin/posts/:id`, etc.
+
 # Resource Options
 
 When defining resources, you can customize which routes are created using `only` or `except` options:
@@ -417,6 +428,7 @@ resources("posts", [authenticate], { only: ["show", "update"] });
 ```
 
 The available actions are:
+
 - `index` - GET /posts
 - `new` - GET /posts/new
 - `create` - POST /posts

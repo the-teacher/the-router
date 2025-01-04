@@ -1,7 +1,10 @@
 {
-  "name": "the-router",
+  "name": "@the-teacher/the-router",
   "version": "0.9.0",
   "description": "Simple router for Express.js, making routes and actions easy to manage.",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "src/index.js",
   "scripts": {
     "build": "node build.js",
@@ -18,7 +21,7 @@
     "router",
     "routing",
     "express-router",
-    "the-router",
+    "@the-teacher/the-router",
     "rails-inspired",
     "lightweight",
     "nodejs",

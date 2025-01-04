@@ -5,6 +5,7 @@
 Express.js provides a basic router, but its flexibility and lack of predefined application structure often lead to inconsistent solutions across different projects.
 
 This router is a wrapper around the basic Express.js router that:
+
 - Defines a clear project structure
 - Makes routing intuitive
 - Simplifies code maintenance
@@ -22,6 +23,7 @@ resources("posts");
 ```
 
 All standard REST actions are supported:
+
 - `index` - list resources
 - `show` - view resource
 - `new` - creation form
@@ -53,9 +55,15 @@ The main similarity with Hanami is the approach to organizing actions. In tradit
 ```ts
 // Traditional controller approach
 class PostsController {
-  index() { /* ... */ }
-  show() { /* ... */ }
-  create() { /* ... */ }
+  index() {
+    /* ... */
+  }
+  show() {
+    /* ... */
+  }
+  create() {
+    /* ... */
+  }
   // etc.
 }
 ```
@@ -84,9 +92,10 @@ export const perform = (req: Request, res: Response) => {
 ## How does the router work?
 
 1. Define routes:
+
 ```ts
 // routes/index.ts
-import { root, get, resources } from "the-router";
+import { root, get, resources } from "@the-teacher/the-router";
 
 root("pages#home");
 get("/about", "pages#about");
@@ -94,6 +103,7 @@ resources("posts");
 ```
 
 2. Create actions:
+
 ```
 src/
   actions/
@@ -107,6 +117,7 @@ src/
 ```
 
 3. Request routing:
+
 ```
 GET /posts/123 ->
   1. Finds route posts/:id
@@ -117,6 +128,7 @@ GET /posts/123 ->
 ## How to start using the router?
 
 1. Create directory structure:
+
 ```
 src/
   actions/    # Actions directory
@@ -125,15 +137,17 @@ src/
 ```
 
 2. Define routes:
+
 ```ts
 // src/routes/index.ts
-import { root, get, resources } from "the-router";
+import { root, get, resources } from "@the-teacher/the-router";
 
 root("pages#home");
 resources("posts");
 ```
 
 3. Create actions:
+
 ```ts
 // src/actions/pages/homeAction.ts
 export const perform = (req, res) => {
@@ -142,14 +156,19 @@ export const perform = (req, res) => {
 ```
 
 4. Connect the router:
+
 ```ts
 // src/index.ts
 import express from "express";
-import { getRouter } from "the-router";
+import { getRouter } from "@the-teacher/the-router";
 import "./routes";
 
 const app = express();
 app.use(getRouter());
+
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
 ```
 
 ## Additional Features
@@ -159,15 +178,18 @@ app.use(getRouter());
 Routes can be grouped using `scope`:
 
 ```ts
-scope("admin", [authenticate], () => {
-  resources("posts");   // /admin/posts
-  resources("users");   // /admin/users
+scope("admin", () => {
+  get("/dashboard", "admin#dashboard"); // /admin/dashboard
+
+  resources("posts"); // /admin/posts
+  resources("users"); // /admin/users
 });
 ```
 
 ### Middleware
 
 Middleware (intermediate software) are functions that execute before request processing by an action. They allow:
+
 - Checking authentication and authorization
 - Logging requests
 - Error handling
@@ -175,6 +197,7 @@ Middleware (intermediate software) are functions that execute before request pro
 - Interrupting the request processing chain
 
 Middleware can be applied to:
+
 - Individual routes
 - Route groups via `scope`
 - All resource routes
@@ -183,11 +206,11 @@ Middleware can be applied to:
 // Authentication middleware
 const authenticate = (req: Request, res: Response, next: Function) => {
   const token = req.headers.authorization;
-  
+
   if (!token) {
     return res.status(401).json({ error: "No token provided" });
   }
-  
+
   try {
     req.user = verifyToken(token);
     next(); // Continue request processing
@@ -208,24 +231,35 @@ scope("admin", [authenticate], () => {
 resources("posts", [authenticate]);
 ```
 
+If you use multiple middleware, it's recommended to create an array beforehand:
+
+```ts
+const permissionsMiddlewares = [authenticate, requireOwner, requireEditorRole];
+
+get("/profile", permissionsMiddlewares, "users#profile");
+```
+
 ### Regular Expressions
 
-The router supports all regular expression capabilities available in the original Express.js router. This allows creating flexible routes for complex cases:
+⚠️ **Warning!** This feature is only supported because the original Express.js router is used. The author of this router does not recommend using regular expressions for routes due to their complexity in understanding and maintenance. If you really need to use regular expressions, it's recommended to thoroughly test their behavior.
+
+The router supports all regular expression capabilities available in the original Express.js router:
 
 ```ts
 // Routes with regular expressions
-get(/.*fly$/, "insects#list");           // Matches /butterfly, /dragonfly
+get(/.*fly$/, "insects#list"); // Matches /butterfly, /dragonfly
 get(/^\/api\/v\d+\/.*$/, "api#handle"); // Matches /api/v1/users, /api/v2/posts
 
 // Combining with middleware
 get(/^\/secure\/.*$/, [authenticate], "secure#handle");
 
 // Order matters for regular expressions too
-get(/^\/api\/v1\/users$/, "users#list");  // Specific route first
-get(/^\/api\/v1\/.*$/, "api#handle");     // General route second
+get(/^\/api\/v1\/users$/, "users#list"); // Specific route first
+get(/^\/api\/v1\/.*$/, "api#handle"); // General route second
 ```
 
-Regular expressions are particularly useful for:
+Regular expressions can be useful for:
+
 - API versioning
 - Handling similar URL groups
 - Creating flexible routing rules
@@ -250,7 +284,7 @@ export const perform = (req: Request, res: Response) => {
   // - res.send() - send response
   // - res.render() - render template
   // - res.status() - set status
-  
+
   // Simple action example
   res.json({ message: "Hello!" });
 };
@@ -259,6 +293,7 @@ export const perform = (req: Request, res: Response) => {
 Examples of typical actions:
 
 Getting resource list:
+
 ```ts
 // actions/posts/indexAction.ts
 export const perform = async (req: Request, res: Response) => {
@@ -268,26 +303,28 @@ export const perform = async (req: Request, res: Response) => {
 ```
 
 Viewing single resource:
+
 ```ts
 // actions/posts/showAction.ts
 export const perform = async (req: Request, res: Response) => {
   const { id } = req.params;
   const post = await Post.findById(id);
-  
+
   if (!post) {
     return res.status(404).json({ error: "Post not found" });
   }
-  
+
   res.json(post);
 };
 ```
 
 Creating new resource:
+
 ```ts
 // actions/posts/createAction.ts
 export const perform = async (req: Request, res: Response) => {
   const { title, content } = req.body;
-  
+
   try {
     const post = await Post.create({ title, content });
     res.status(201).json(post);
@@ -304,7 +341,7 @@ Actions are easy to test since each action is a separate module with a single fu
 ```ts
 import request from "supertest";
 import express from "express";
-import { getRouter, setActionsPath } from "the-router";
+import { getRouter, setActionsPath } from "@the-teacher/the-router";
 import path from "path";
 
 describe("Posts actions", () => {
@@ -313,10 +350,10 @@ describe("Posts actions", () => {
   beforeEach(() => {
     // Create new application for each test
     app = express();
-    
+
     // Set path to test actions
     setActionsPath(path.join(__dirname, "./test_actions"));
-    
+
     // Connect router
     app.use(getRouter());
   });
@@ -324,14 +361,12 @@ describe("Posts actions", () => {
   describe("GET /posts/:id", () => {
     test("returns post by id", async () => {
       // Perform GET request to /posts/123
-      const response = await request(app)
-        .get("/posts/123")
-        .expect(200);
+      const response = await request(app).get("/posts/123").expect(200);
 
       // Check response
       expect(response.body).toEqual({
         action: "show",
-        id: "123"
+        id: "123",
       });
     });
   });
@@ -340,7 +375,7 @@ describe("Posts actions", () => {
     test("creates new post", async () => {
       const postData = {
         title: "New Post",
-        content: "Content"
+        content: "Content",
       };
 
       // Perform POST request with data
@@ -352,7 +387,7 @@ describe("Posts actions", () => {
       // Check response
       expect(response.body).toEqual({
         action: "create",
-        data: postData
+        data: postData,
       });
     });
   });
@@ -395,13 +430,36 @@ test("requires authentication", async () => {
   get("/profile", [authenticate], "users#profile");
 
   // Test without token
-  await request(app)
-    .get("/profile")
-    .expect(401);
+  await request(app).get("/profile").expect(401);
 
   // Test with correct token
   await request(app)
     .get("/profile")
     .set("Authorization", "Bearer valid-token")
     .expect(200);
-}); 
+});
+```
+
+### Can I use controllers?
+
+The router is specifically designed to work with individual actions. Actions are placed in separate files in corresponding directories. Directories correspond to controllers.
+
+Controllers are used for logical code separation, but not physical separation.
+
+This is done to eliminate reading and understanding sometimes complex logic in controller files, where multiple actions make them difficult to read and understand.
+
+### How to organize reusable logic?
+
+Create common middleware or utilities:
+
+```ts
+// middleware/auth.ts
+export const authenticate = (req, res, next) => {
+  // Common authentication logic
+};
+
+// validations/postsValidations.ts
+export const validatePost = (data) => {
+  // Common validation logic
+};
+```

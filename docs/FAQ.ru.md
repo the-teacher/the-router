@@ -1,10 +1,11 @@
-# Вопросы и ответы
+# Часто задаваемые вопросы
 
 ## Зачем нужен этот роутер?
 
 Express.js предоставляет базовый роутер, но его гибкость и отсутствие предопределённой структуры приложения часто приводят к несогласованным решениям в разных проектах.
 
 Этот роутер является надстройкой над базовым роутером Express.js и:
+
 - Задаёт чёткую структуру проекта
 - Делает маршрутизацию интуитивно понятной
 - Упрощает поддержку кода
@@ -22,6 +23,7 @@ resources("posts");
 ```
 
 Поддерживаются все стандартные REST-действия:
+
 - `index` - список ресурсов
 - `show` - просмотр ресурса
 - `new` - форма создания
@@ -30,7 +32,7 @@ resources("posts");
 - `update` - обновление ресурса
 - `destroy` - удаление ресурса
 
-Метод `resources` автоматически создаёт все необходимые маршруты:
+Метод `resources` автоматически создаёт все необходимые базовые маршруты:
 
 ```ts
 resources("posts");
@@ -53,9 +55,15 @@ resources("posts");
 ```ts
 // Традиционный подход с контроллером
 class PostsController {
-  index() { /* ... */ }
-  show() { /* ... */ }
-  create() { /* ... */ }
+  index() {
+    /* ... */
+  }
+  show() {
+    /* ... */
+  }
+  create() {
+    /* ... */
+  }
   // и т.д.
 }
 ```
@@ -84,9 +92,10 @@ export const perform = (req: Request, res: Response) => {
 ## Как работает роутер?
 
 1. Определяем маршруты:
+
 ```ts
 // routes/index.ts
-import { root, get, resources } from "the-router";
+import { root, get, resources } from "@the-teacher/the-router";
 
 root("pages#home");
 get("/about", "pages#about");
@@ -94,6 +103,7 @@ resources("posts");
 ```
 
 2. Создаём действия:
+
 ```
 src/
   actions/
@@ -107,6 +117,7 @@ src/
 ```
 
 3. Маршрутизация запроса:
+
 ```
 GET /posts/123 ->
   1. Находит маршрут posts/:id
@@ -117,6 +128,7 @@ GET /posts/123 ->
 ## Как начать использовать роутер?
 
 1. Создайте структуру каталогов:
+
 ```
 src/
   actions/    # Каталог для действий
@@ -125,15 +137,17 @@ src/
 ```
 
 2. Определите маршруты:
+
 ```ts
 // src/routes/index.ts
-import { root, get, resources } from "the-router";
+import { root, get, resources } from "@the-teacher/the-router";
 
 root("pages#home");
 resources("posts");
 ```
 
 3. Создайте действия:
+
 ```ts
 // src/actions/pages/homeAction.ts
 export const perform = (req, res) => {
@@ -142,14 +156,19 @@ export const perform = (req, res) => {
 ```
 
 4. Подключите роутер:
+
 ```ts
 // src/index.ts
 import express from "express";
-import { getRouter } from "the-router";
+import { getRouter } from "@the-teacher/the-router";
 import "./routes";
 
 const app = express();
 app.use(getRouter());
+
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
 ```
 
 ## Дополнительные возможности
@@ -159,9 +178,11 @@ app.use(getRouter());
 Маршруты можно группировать с помощью `scope`:
 
 ```ts
-scope("admin", [authenticate], () => {
-  resources("posts");   // /admin/posts
-  resources("users");   // /admin/users
+scope("admin", () => {
+  get("/dashboard", "admin#dashboard"); // /admin/dashboard
+
+  resources("posts"); // /admin/posts
+  resources("users"); // /admin/users
 });
 ```
 
@@ -178,12 +199,20 @@ scope("admin", [authenticate, requireAdmin], () => {
 });
 ```
 
+Если вы используете несколько middleware, рекомендуется заранее сформировать массив:
+
+```ts
+const permissionsMiddlewares = [authenticate, requireOwner, requireEditorRole];
+
+get("/profile", permissionsMiddlewares, "users#profile");
+```
+
 ### Регулярные выражения
 
 Поддерживаются маршруты с регулярными выражениями:
 
 ```ts
-get(/.*fly$/, "insects#list");  // Совпадёт с /butterfly, /dragonfly
+get(/.*fly$/, "insects#list"); // Совпадёт с /butterfly, /dragonfly
 ```
 
 ### Порядок маршрутов
@@ -196,15 +225,30 @@ get("/posts/featured", "posts#featured");
 get("/posts/:id", "posts#show");
 
 // ❌ Неправильно
-get("/posts/:id", "posts#show");        // Перехватит /posts/featured
+get("/posts/:id", "posts#show"); // Перехватит /posts/featured
 get("/posts/featured", "posts#featured"); // Никогда не сработает
 ```
 
-## Часто задаваемые вопросы
-
 ### Можно ли использовать контроллеры?
 
-Роутер специально спроектирован для работы с отдельными действиями, но вы можете организовать общую логику через shared-модули или базовые классы действий.
+Роутер специально спроектирован для работы с отдельными действиями. Действия располагаются в отдельных файлах в соответствующих директориях. Директории соответствуют контроллерам.
+
+Контроллеры используются в логическом разделении кода, но не в физическом.
+
+Это сделано для того, чтобы исключить чтение и понимание иногда сложной логики в файлах контроллеров, где из-за наличия множества действий их сложно читать и понимать.
+
+Действие является отдельным модулем, который экспортирует функцию `perform`. Эта функция является обработчиком запроса пришедшего от `Express.js` и принимает те же параметры:
+
+```ts
+import { Request, Response } from "express";
+
+export const perform = (req: Request, res: Response) => {
+  // req - объект запроса Express.js
+  // - req.params - параметры маршрута (/users/:id)
+  // - req.query - параметры запроса (?name=value)
+  // - req.body - тело запроса (для POST/PUT/PATCH)
+  // - req.headers - заголовки запроса
+```
 
 ### Как организовать повторно используемую логику?
 
@@ -216,7 +260,7 @@ export const authenticate = (req, res, next) => {
   // Общая логика аутентификации
 };
 
-// utils/validation.ts
+// validations/postsValidations.ts
 export const validatePost = (data) => {
   // Общая логика валидации
 };
@@ -232,11 +276,11 @@ import { perform } from "../actions/posts/showAction";
 test("show action", () => {
   const req = { params: { id: "123" } };
   const res = { json: jest.fn() };
-  
+
   perform(req, res);
   expect(res.json).toHaveBeenCalledWith(/* ... */);
 });
-``` 
+```
 
 ## Устройство действий (Actions)
 
@@ -257,7 +301,7 @@ export const perform = (req: Request, res: Response) => {
   // - res.send() - отправить ответ
   // - res.render() - отрендерить шаблон
   // - res.status() - установить статус
-  
+
   // Пример простого действия
   res.json({ message: "Hello!" });
 };
@@ -266,6 +310,7 @@ export const perform = (req: Request, res: Response) => {
 Примеры типичных действий:
 
 Получение списка ресурсов:
+
 ```ts
 // actions/posts/indexAction.ts
 export const perform = async (req: Request, res: Response) => {
@@ -275,26 +320,28 @@ export const perform = async (req: Request, res: Response) => {
 ```
 
 Просмотр отдельного ресурса:
+
 ```ts
 // actions/posts/showAction.ts
 export const perform = async (req: Request, res: Response) => {
   const { id } = req.params;
   const post = await Post.findById(id);
-  
+
   if (!post) {
     return res.status(404).json({ error: "Post not found" });
   }
-  
+
   res.json(post);
 };
 ```
 
 Создание нового ресурса:
+
 ```ts
 // actions/posts/createAction.ts
 export const perform = async (req: Request, res: Response) => {
   const { title, content } = req.body;
-  
+
   try {
     const post = await Post.create({ title, content });
     res.status(201).json(post);
@@ -307,6 +354,7 @@ export const perform = async (req: Request, res: Response) => {
 ### Middleware
 
 Middleware (промежуточное ПО) - это функции, которые выполняются до обработки запроса действием. Они позволяют:
+
 - Проверять аутентификацию и авторизацию
 - Логировать запросы
 - Обрабатывать ошибки
@@ -314,6 +362,7 @@ Middleware (промежуточное ПО) - это функции, котор
 - Прерывать цепочку обработки запроса
 
 Middleware можно применять:
+
 - К отдельным маршрутам
 - К группам маршрутов через `scope`
 - Ко всем маршрутам ресурса
@@ -322,11 +371,11 @@ Middleware можно применять:
 // Middleware для аутентификации
 const authenticate = (req: Request, res: Response, next: Function) => {
   const token = req.headers.authorization;
-  
+
   if (!token) {
     return res.status(401).json({ error: "No token provided" });
   }
-  
+
   try {
     req.user = verifyToken(token);
     next(); // Продолжить обработку запроса
@@ -351,20 +400,23 @@ resources("posts", [authenticate]);
 
 Роутер поддерживает все возможности работы с регулярными выражениями, доступные в оригинальном роутере Express.js. Это позволяет создавать гибкие маршруты для сложных случаев:
 
+:warning: **Внимание!** Данная возможность поддерживается только из-за того, что используется оригинальный роутер `Express.js`. Автор данного роутера не рекомендует использовать регулярные выражения для маршрутов из-за сложности их понимания и поддержки. В случае, если вам действительно нужно использовать регулярные выражения, рекомендуется тщательно тестировать их работу.
+
 ```ts
 // Маршруты с регулярными выражениями
-get(/.*fly$/, "insects#list");           // Совпадёт с /butterfly, /dragonfly
+get(/.*fly$/, "insects#list"); // Совпадёт с /butterfly, /dragonfly
 get(/^\/api\/v\d+\/.*$/, "api#handle"); // Совпадёт с /api/v1/users, /api/v2/posts
 
 // Комбинация с middleware
 get(/^\/secure\/.*$/, [authenticate], "secure#handle");
 
 // Порядок важен и для регулярных выражений
-get(/^\/api\/v1\/users$/, "users#list");  // Сначала конкретный маршрут
-get(/^\/api\/v1\/.*$/, "api#handle");     // Затем общий
+get(/^\/api\/v1\/users$/, "users#list"); // Сначала конкретный маршрут
+get(/^\/api\/v1\/.*$/, "api#handle"); // Затем общий
 ```
 
-Использование регулярных выражений особенно полезно для:
+Использование регулярных выражений может быть полезно для:
+
 - Версионирования API
 - Обработки групп похожих URL
 - Создания гибких правил маршрутизации
@@ -377,7 +429,7 @@ get(/^\/api\/v1\/.*$/, "api#handle");     // Затем общий
 ```ts
 import request from "supertest";
 import express from "express";
-import { getRouter, setActionsPath } from "the-router";
+import { getRouter, setActionsPath } from "@the-teacher/the-router";
 import path from "path";
 
 describe("Posts actions", () => {
@@ -386,10 +438,10 @@ describe("Posts actions", () => {
   beforeEach(() => {
     // Создаём новое приложение для каждого теста
     app = express();
-    
+
     // Указываем путь к тестовым действиям
     setActionsPath(path.join(__dirname, "./test_actions"));
-    
+
     // Подключаем роутер
     app.use(getRouter());
   });
@@ -397,14 +449,12 @@ describe("Posts actions", () => {
   describe("GET /posts/:id", () => {
     test("returns post by id", async () => {
       // Выполняем GET-запрос к /posts/123
-      const response = await request(app)
-        .get("/posts/123")
-        .expect(200);
+      const response = await request(app).get("/posts/123").expect(200);
 
       // Проверяем ответ
       expect(response.body).toEqual({
         action: "show",
-        id: "123"
+        id: "123",
       });
     });
   });
@@ -413,7 +463,7 @@ describe("Posts actions", () => {
     test("creates new post", async () => {
       const postData = {
         title: "New Post",
-        content: "Content"
+        content: "Content",
       };
 
       // Выполняем POST-запрос с данными
@@ -425,7 +475,7 @@ describe("Posts actions", () => {
       // Проверяем ответ
       expect(response.body).toEqual({
         action: "create",
-        data: postData
+        data: postData,
       });
     });
   });
@@ -468,13 +518,12 @@ test("requires authentication", async () => {
   get("/profile", [authenticate], "users#profile");
 
   // Тест без токена
-  await request(app)
-    .get("/profile")
-    .expect(401);
+  await request(app).get("/profile").expect(401);
 
   // Тест с правильным токеном
   await request(app)
     .get("/profile")
     .set("Authorization", "Bearer valid-token")
     .expect(200);
-}); 
+});
+```

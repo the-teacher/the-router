@@ -11,7 +11,7 @@
 ### 1. Скопируйте проект
 
 ```bash
-git clone https://github.com/the-teacher/the-router.git
+git clone https://github.com/the-teacher/the_router.git
 ```
 
 ### 2. Запустите тесты в контейнере
@@ -62,7 +62,7 @@ docker-compose down
 ### 1. Скопируйте проект
 
 ```bash
-git clone https://github.com/the-teacher/the-router.git
+git clone https://github.com/the-teacher/the_router.git
 ```
 
 ### 2. Запустите оболочку

@@ -6,6 +6,7 @@ let router: Router | null = null;
 let currentScope: string | null = null;
 let scopeMiddlewares: RequestHandler[] = [];
 let actionsPath: string = DEFAULT_ACTIONS_PATH;
+let isCustomPath: boolean = false;
 let routerOptions: RouterOptions = {};
 
 export const setRouterOptions = (options: RouterOptions) => {
@@ -23,12 +24,17 @@ export const resetRouter = () => {
   router = null;
   currentScope = null;
   scopeMiddlewares = [];
+  isCustomPath = false;
   actionsPath = DEFAULT_ACTIONS_PATH;
   routerOptions = {};
 };
+export const setActionsPath = (path: string) => {
+  isCustomPath = true;
+  actionsPath = path;
+  return path;
+};
 
-export const setActionsPath = (path: string) => (actionsPath = path);
-
+export const isCustomActionsPath = () => isCustomPath;
 export const getActionsPath = () => actionsPath;
 
 export const setRouterScope = (scope: string | null) => {

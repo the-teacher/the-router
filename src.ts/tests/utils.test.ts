@@ -75,13 +75,16 @@ describe("Utils", () => {
       expect(typeof handler).toBe("function");
     });
 
-    test("should throw error when action doesn't exist", () => {
+    test("should throw MODULE_NOT_FOUND error when action doesn't exist", () => {
       const scopeName = "test";
       const action = "nonExistent";
 
-      expect(() => {
+      try {
         loadAction(scopeName, action);
-      }).toThrow(/Cannot find module/);
+        fail("Expected error to be thrown");
+      } catch (error: any) {
+        expect(error.code).toBe("MODULE_NOT_FOUND");
+      }
     });
   });
 

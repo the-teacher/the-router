@@ -28,8 +28,8 @@ make up
 docker-compose up -d
 
 [+] Running 2/2
- ✔ Network the_router_default  Created                                                                                                              0.0s
- ✔ Container the_router-app-1  Started                                                                                                              0.3s
+ ✔ Network the-router_default  Created                                                                                                              0.0s
+ ✔ Container the-router-app-1  Started                                                                                                              0.3s
 make install
 docker-compose exec app yarn install
 yarn install v1.22.22
@@ -53,8 +53,8 @@ Done in 3.34s.
 make down
 docker-compose down
 [+] Running 2/1
- ✔ Container the_router-app-1  Removed                                                                                                             10.1s
- ✔ Network the_router_default  Removed
+ ✔ Container the-router-app-1  Removed                                                                                                             10.1s
+ ✔ Network the-router_default  Removed
 ```
 
 ## Get into the container

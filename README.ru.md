@@ -19,15 +19,15 @@
 ## Установка
 
 ```bash
-npm install the-router
+npm install @the-teacher/the-router
 ```
 
 ```bash
-yarn add the-router
+yarn add @the-teacher/the-router
 ```
 
 ```bash
-pnpm add the-router
+pnpm add @the-teacher/the-router
 ```
 
 ## Использование
@@ -37,19 +37,25 @@ pnpm add the-router
 `routes/index.ts`
 
 ```ts
-import { root, get, post, getRouter, routeScope as scope } from "the-router";
+import {
+  root,
+  get,
+  post,
+  getRouter,
+  routeScope as scope,
+} from "@the-teacher/the-router";
 
 // Определение корневого маршрута
-root("index#index");  // Использует src/actions/index/indexAction.ts
+root("index#index"); // Использует src/actions/index/indexAction.ts
 
 // Определение GET и POST маршрутов
-get("/users", "users#show");    // Использует src/actions/users/showAction.ts
+get("/users", "users#show"); // Использует src/actions/users/showAction.ts
 post("/users", "users#create"); // Использует src/actions/users/createAction.ts
 
 // Определение сгруппированных маршрутов
 scope("admin", () => {
-  get("/users", "users#create");    // Использует src/actions/admin/users/createAction.ts
-  post("/users", "users#update");   // Использует src/actions/admin/users/updateAction.ts
+  get("/users", "users#create"); // Использует src/actions/admin/users/createAction.ts
+  post("/users", "users#update"); // Использует src/actions/admin/users/updateAction.ts
 });
 ```
 
@@ -88,7 +94,7 @@ export const perform = (req: Request, res: Response) => {
 
 ```ts
 scope("admin", () => {
-  get("/users", "admin/users#list");   // Использует src/actions/admin/users/listAction.ts
+  get("/users", "admin/users#list"); // Использует src/actions/admin/users/listAction.ts
   post("/users", "admin/users#create"); // Использует src/actions/admin/users/createAction.ts
 });
 ```
@@ -190,25 +196,26 @@ src/
 Пример маршрутов, соответствующих этой структуре:
 
 ```ts
-import { root, get, post, routeScope as scope } from "the-router";
+import { root, get, post, routeScope as scope } from "@the-teacher/the-router";
 
 // Корневой и базовые маршруты
-root("index#index");              // -> src/actions/index/indexAction.ts
-get("/users", "users#show");      // -> src/actions/users/showAction.ts
-post("/users", "users#create");   // -> src/actions/users/createAction.ts
-get("/posts", "posts#show");      // -> src/actions/posts/showAction.ts
-post("/posts", "posts#create");   // -> src/actions/posts/createAction.ts
+root("index#index"); // -> src/actions/index/indexAction.ts
+get("/users", "users#show"); // -> src/actions/users/showAction.ts
+post("/users", "users#create"); // -> src/actions/users/createAction.ts
+get("/posts", "posts#show"); // -> src/actions/posts/showAction.ts
+post("/posts", "posts#create"); // -> src/actions/posts/createAction.ts
 
 // Административная часть
 scope("admin", () => {
-  get("/users", "users#list");     // -> src/actions/admin/users/listAction.ts
-  post("/users", "users#create");  // -> src/actions/admin/users/createAction.ts
-  get("/posts", "posts#list");     // -> src/actions/admin/posts/listAction.ts
-  post("/posts", "posts#update");  // -> src/actions/admin/posts/updateAction.ts
+  get("/users", "users#list"); // -> src/actions/admin/users/listAction.ts
+  post("/users", "users#create"); // -> src/actions/admin/users/createAction.ts
+  get("/posts", "posts#list"); // -> src/actions/admin/posts/listAction.ts
+  post("/posts", "posts#update"); // -> src/actions/admin/posts/updateAction.ts
 });
 ```
 
 Это создаст маршруты:
+
 - GET `/` -> `src/actions/index/indexAction.ts`
 - GET `/users` -> `src/actions/users/showAction.ts`
 - POST `/users` -> `src/actions/users/createAction.ts`
@@ -225,8 +232,8 @@ scope("admin", () => {
 
 ```ts
 scope("admin", () => {
-  get("/users", "users#list");     // -> src/actions/admin/users/listAction.ts
-  post("/users", "users#create");  // -> src/actions/admin/users/createAction.ts
+  get("/users", "users#list"); // -> src/actions/admin/users/listAction.ts
+  post("/users", "users#create"); // -> src/actions/admin/users/createAction.ts
 });
 ```
 
@@ -236,7 +243,7 @@ scope("admin", () => {
 
 ```ts
 // Базовые маршруты с параметрами
-get("/users/:id", "users#show");           // -> /users/123
+get("/users/:id", "users#show"); // -> /users/123
 get("/posts/:id/comments", "posts#comments"); // -> /posts/456/comments
 
 // Параметры с middleware
@@ -252,12 +259,12 @@ get("/posts/:postId/comments/:commentId", "comments#show");
 
 ```ts
 // ✅ Правильный порядок
-get("/posts/featured", "posts#featured");  // Сначала специфичный маршрут
-get("/posts/:id", "posts#show");          // Затем общий маршрут
+get("/posts/featured", "posts#featured"); // Сначала специфичный маршрут
+get("/posts/:id", "posts#show"); // Затем общий маршрут
 
 // ❌ Неправильный порядок - "/posts/featured" никогда не будет достигнут
-get("/posts/:id", "posts#show");          // Общий маршрут перехватывает все
-get("/posts/featured", "posts#featured");  // Никогда не сработает
+get("/posts/:id", "posts#show"); // Общий маршрут перехватывает все
+get("/posts/featured", "posts#featured"); // Никогда не сработает
 ```
 
 ### Организация Middleware
@@ -277,7 +284,7 @@ post("/users", [...authMiddlewares, ...validationMiddlewares], "users#create");
 const adminMiddlewares = [authenticate, requireAdmin, logAccess];
 scope("admin", adminMiddlewares, () => {
   get("/users", "users#list");
-  
+
   // Дополнительные middleware для конкретных маршрутов
   const userUpdateMiddlewares = [validateUser];
   post("/users/:id", userUpdateMiddlewares, "users#update");
@@ -287,6 +294,7 @@ scope("admin", adminMiddlewares, () => {
 ### API Reference
 
 Базовое использование:
+
 - `root(scopeAction)`: Определяет корневой маршрут (`/`)
 - `get(path, scopeAction)`: Определяет GET маршрут
 - `post(path, scopeAction)`: Определяет POST маршрут
@@ -299,6 +307,7 @@ scope("admin", adminMiddlewares, () => {
 - `scope(prefix, callback)`: Группирует маршруты под общим префиксом
 
 С middleware:
+
 - `root(middlewares[], scopeAction)`: Определяет корневой маршрут с middleware
 - `get(path, middlewares[], scopeAction)`: Определяет GET маршрут с middleware
 - `post(path, middlewares[], scopeAction)`: Определяет POST маршрут с middleware
@@ -311,6 +320,7 @@ scope("admin", adminMiddlewares, () => {
 - `scope(prefix, middlewares[], callback)`: Группирует маршруты с middleware
 
 Примеры:
+
 ```ts
 // Базовое использование
 root("index#index");
@@ -322,14 +332,18 @@ destroy("/users/:id", "users#delete");
 options("/users", "users#options");
 head("/users", "users#head");
 all("/api", "api#handle");
-scope("admin", () => { /* маршруты */ });
+scope("admin", () => {
+  /* маршруты */
+});
 
 // С middleware
 const authMiddlewares = [authenticate, logRequest];
 root([authenticate], "index#index");
 get("/users", authMiddlewares, "users#show");
 put("/users/:id", authMiddlewares, "users#update");
-scope("admin", authMiddlewares, () => { /* маршруты */ });
+scope("admin", authMiddlewares, () => {
+  /* маршруты */
+});
 ```
 
 ### Маршруты с регулярными выражениями
@@ -338,15 +352,15 @@ scope("admin", authMiddlewares, () => { /* маршруты */ });
 
 ```ts
 // Сопоставление путей, заканчивающихся на 'fly'
-get(/.*fly$/, "insects#list");           // Совпадает с: /butterfly, /dragonfly
+get(/.*fly$/, "insects#list"); // Совпадает с: /butterfly, /dragonfly
 get(/^\/api\/v\d+\/.*$/, "api#handle"); // Совпадает с: /api/v1/users, /api/v2/posts
 
 // Маршруты с регулярными выражениями и middleware
 get(/^\/secure\/.*$/, [authenticate], "secure#handle");
 
 // Порядок важен и для маршрутов с регулярными выражениями
-get(/^\/api\/v1\/users$/, "users#list");  // Сначала специфичный маршрут
-get(/^\/api\/v1\/.*$/, "api#handle");     // Затем общий маршрут
+get(/^\/api\/v1\/users$/, "users#list"); // Сначала специфичный маршрут
+get(/^\/api\/v1\/.*$/, "api#handle"); // Затем общий маршрут
 ```
 
 Примечание: При использовании регулярных выражений путь передается в `Express.js` как есть, без какой-либо нормализации.
@@ -360,6 +374,7 @@ resources("posts");
 ```
 
 Это создаст следующие маршруты:
+
 - `GET /posts` -> `src/actions/posts/indexAction.ts`
 - `GET /posts/new` -> `src/actions/posts/newAction.ts`
 - `POST /posts` -> `src/actions/posts/createAction.ts`
@@ -380,7 +395,7 @@ resources("posts", postMiddlewares);
 
 ```ts
 scope("admin", [authenticate], () => {
-  resources("posts");  // Маршруты будут начинаться с /admin
+  resources("posts"); // Маршруты будут начинаться с /admin
   resources("users"); // Маршруты будут начинаться с /admin
 });
 ```

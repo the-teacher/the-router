@@ -1,5 +1,5 @@
 import path from "path";
-import { getActionsPath } from "./base";
+import { getActionsPath, isCustomActionsPath } from "./base";
 
 export const getProjectRoot = () => process.cwd();
 
@@ -17,6 +17,10 @@ export const buildActionPath = (scope: string, action: string) => {
   const actionsPath = getActionsPath();
   const normalizedScope = scope.replace(/\//g, path.sep);
   const actionFile = `${action}Action`;
+
+  if (!isCustomActionsPath()) {
+    return path.join(process.cwd(), actionsPath, normalizedScope, actionFile);
+  }
 
   return path.join(actionsPath, normalizedScope, actionFile);
 };
