@@ -131,19 +131,28 @@ var buildActionPath = (scope2, action) => {
   }
   return import_path.default.join(actionsPath2, normalizedScope, actionFile);
 };
-var loadAction = (scope2, action) => {
-  const actionPath = buildActionPath(scope2, action);
+var loadAction = (actionPath) => {
   try {
     const actionModule = require(actionPath);
     if (typeof actionModule.perform !== "function") {
       throw new Error(
-        `Action module for scope: ${scope2}, action: ${action} must export a 'perform' function`
+        `Action module at ${actionPath} must export a 'perform' function`
       );
     }
     return actionModule.perform;
   } catch (error) {
     if (error.code === "MODULE_NOT_FOUND") {
-      throw error;
+      console.error(`[WARNING] Action file not found: ${actionPath}`);
+      console.error(
+        `[WARNING] Please create action file with 'perform' function`
+      );
+      return (_req, res) => {
+        res.status(501).json({
+          error: "Not Implemented",
+          message: `Action handler not found: ${actionPath}`,
+          details: "The requested action has not been implemented yet"
+        });
+      };
     }
     throw error;
   }
@@ -164,7 +173,7 @@ var root = (middlewares, scopeAction) => {
     actionString = middlewares;
   }
   const { scope: scope2, action } = parseScopeActionString(actionString);
-  handlers.push(loadAction(scope2, action));
+  handlers.push(loadActionHandler(scope2, action));
   getRouter().get("/", ...handlers);
 };
 var createRouteHandler = (method) => (urlPath, middlewares, scopeAction) => {
@@ -181,7 +190,7 @@ var createRouteHandler = (method) => (urlPath, middlewares, scopeAction) => {
     actionString = middlewares;
   }
   const { scope: scope2, action } = parseScopeActionString(actionString);
-  handlers.push(loadAction(scope2, action));
+  handlers.push(loadActionHandler(scope2, action));
   const router2 = getRouter();
   const path2 = urlPath instanceof RegExp ? urlPath : urlPath.startsWith("/") ? urlPath : `/${urlPath}`;
   switch (method) {
@@ -298,10 +307,14 @@ var resources = (resourceName, middlewaresOrOptions, options2) => {
 };
 var createHandlers = (middlewares, scope2, action) => {
   const handlers = [...getScopeMiddlewares(), ...middlewares];
-  handlers.push(loadAction(scope2, action));
+  handlers.push(loadActionHandler(scope2, action));
   return handlers;
 };
 var scope = routeScope;
+var loadActionHandler = (scope2, action) => {
+  const actionPath = buildActionPath(scope2, action);
+  return loadAction(actionPath);
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   all,
