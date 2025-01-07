@@ -677,4 +677,20 @@ describe("Routes", () => {
       expect(response1.body).toEqual(response3.body);
     });
   });
+
+  describe("Missing Action Tests", () => {
+    test("should throw error when action file does not exist", () => {
+      expect(() => {
+        root("non_existent#index");
+      }).toThrow(/Cannot find module.*non_existent\/indexAction/);
+    });
+
+    test("should throw error with correct path when action missing in scope", () => {
+      expect(() => {
+        scope("admin", () => {
+          get("/users", "missing#list");
+        });
+      }).toThrow(/Cannot find module '.*\/missing\/listAction'/);
+    });
+  });
 });
