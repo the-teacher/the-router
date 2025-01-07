@@ -71,20 +71,35 @@ describe("Utils", () => {
       const scopeName = "test";
       const action = "get";
 
-      const handler = loadAction(scopeName, action);
+      const actionPath = buildActionPath(scopeName, action);
+      const handler = loadAction(actionPath);
       expect(typeof handler).toBe("function");
     });
 
-    test("should throw MODULE_NOT_FOUND error when action doesn't exist", () => {
+    test("should return fallback handler for non-existent action", async () => {
       const scopeName = "test";
       const action = "nonExistent";
 
-      try {
-        loadAction(scopeName, action);
-        fail("Expected error to be thrown");
-      } catch (error: any) {
-        expect(error.code).toBe("MODULE_NOT_FOUND");
-      }
+      const actionPath = buildActionPath(scopeName, action);
+      const handler = loadAction(actionPath);
+
+      // Create mocks for req and res
+      const req = {};
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
+      // Call the handler
+      await handler(req, res);
+
+      // Verify that response was sent with 501 status code
+      expect(res.status).toHaveBeenCalledWith(501);
+      expect(res.json).toHaveBeenCalledWith({
+        error: "Not Implemented",
+        message: expect.stringContaining("nonExistentAction"),
+        details: "The requested action has not been implemented yet",
+      });
     });
   });
 

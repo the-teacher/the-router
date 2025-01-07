@@ -25,23 +25,33 @@ export const buildActionPath = (scope: string, action: string) => {
   return path.join(actionsPath, normalizedScope, actionFile);
 };
 
-export const loadAction = (scope: string, action: string) => {
-  const actionPath = buildActionPath(scope, action);
-
+export const loadAction = (actionPath: string) => {
   try {
     const actionModule = require(actionPath);
 
     if (typeof actionModule.perform !== "function") {
       throw new Error(
-        `Action module for scope: ${scope}, action: ${action} must export a 'perform' function`
+        `Action module at ${actionPath} must export a 'perform' function`
       );
     }
 
     return actionModule.perform;
   } catch (error: any) {
     if (error.code === "MODULE_NOT_FOUND") {
-      throw error;
+      console.error(`[WARNING] Action file not found: ${actionPath}`);
+      console.error(
+        `[WARNING] Please create action file with 'perform' function`
+      );
+
+      return (_req: any, res: any) => {
+        res.status(501).json({
+          error: "Not Implemented",
+          message: `Action handler not found: ${actionPath}`,
+          details: "The requested action has not been implemented yet",
+        });
+      };
     }
+
     throw error;
   }
 };

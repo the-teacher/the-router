@@ -10,7 +10,7 @@ import {
   setRouterOptions,
 } from "./base";
 
-import { parseScopeActionString, loadAction } from "./utils";
+import { parseScopeActionString, loadAction, buildActionPath } from "./utils";
 
 export const root = (
   middlewares: RequestHandler[] | string,
@@ -31,7 +31,7 @@ export const root = (
   }
 
   const { scope, action } = parseScopeActionString(actionString);
-  handlers.push(loadAction(scope, action));
+  handlers.push(loadActionHandler(scope, action));
 
   getRouter().get("/", ...handlers);
 };
@@ -58,7 +58,7 @@ const createRouteHandler =
     }
 
     const { scope, action } = parseScopeActionString(actionString);
-    handlers.push(loadAction(scope, action));
+    handlers.push(loadActionHandler(scope, action));
 
     const router = getRouter();
     const path =
@@ -216,7 +216,7 @@ const createHandlers = (
   action: string
 ): RequestHandler[] => {
   const handlers = [...getScopeMiddlewares(), ...middlewares];
-  handlers.push(loadAction(scope, action));
+  handlers.push(loadActionHandler(scope, action));
   return handlers;
 };
 
@@ -230,4 +230,9 @@ export {
   resetRouter,
   routeScope,
   setRouterOptions,
+};
+
+const loadActionHandler = (scope: string, action: string) => {
+  const actionPath = buildActionPath(scope, action);
+  return loadAction(actionPath);
 };
