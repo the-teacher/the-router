@@ -40,16 +40,16 @@ pnpm add @the-teacher/the-router
 import { root, get, post, routerScope as scope } from "@the-teacher/the-router";
 
 // Define root route
-root("index#index"); // Will use src/actions/index/indexAction.ts
+root("index/index"); // Will use src/actions/index/indexAction.ts
 
 // Define GET and POST routes
-get("/users", "users#show"); // Will use src/actions/users/showAction.ts
-post("/users", "users#create"); // Will use src/actions/users/createAction.ts
+get("/users", "users/list"); // Will use src/actions/users/listAction.ts
+post("/users", "users/create"); // Will use src/actions/users/createAction.ts
 
 // Define GET and POST routes
 scope("admin", () => {
-  get("/users", "users#create"); // Will use src/actions/admin/users/createAction.ts
-  post("/users", "users#update"); // Will use src/actions/admin/users/updateAction.ts
+  get("/users", "admin/users/create"); // Will use src/actions/admin/users/createAction.ts
+  post("/users", "admin/users/update"); // Will use src/actions/admin/users/updateAction.ts
 });
 ```
 
@@ -102,8 +102,8 @@ Group related routes under a common prefix:
 
 ```ts
 scope("admin", () => {
-  get("/users", "admin/users#list"); // Will use src/actions/admin/users/listAction.ts
-  post("/users", "admin/users#create"); // Will use src/actions/admin/users/createAction.ts
+  get("/users", "admin/users/list"); // Will use src/actions/admin/users/listAction.ts
+  post("/users", "admin/users/create"); // Will use src/actions/admin/users/createAction.ts
 });
 ```
 
@@ -209,16 +209,16 @@ Example of routes matching this structure:
 import { root, get, post, routeScope as scope } from "@the-teacher/the-router";
 
 // Root and basic routes
-root("index#index"); // -> src/actions/index/indexAction.ts
-get("/users", "users#show"); // -> src/actions/users/showAction.ts
-post("/users", "users#create"); // -> src/actions/users/createAction.ts
-get("/posts", "posts#show"); // -> src/actions/posts/showAction.ts
-post("/posts", "posts#create"); // -> src/actions/posts/createAction.ts
+root("index/index"); // -> src/actions/index/indexAction.ts
+get("/users", "users/list"); // -> src/actions/users/listAction.ts
+post("/users", "users/create"); // -> src/actions/users/createAction.ts
+get("/posts", "posts/show"); // -> src/actions/posts/showAction.ts
+post("/posts", "posts/create"); // -> src/actions/posts/createAction.ts
 
 // Admin scope
 scope("admin", () => {
   get("/users", "users#list"); // -> src/actions/admin/users/listAction.ts
-  post("/users", "users#create"); // -> src/actions/admin/users/createAction.ts
+  post("/users", "admin/users/create"); // -> src/actions/admin/users/createAction.ts
   get("/posts", "posts#list"); // -> src/actions/admin/posts/listAction.ts
   post("/posts", "posts#update"); // -> src/actions/admin/posts/updateAction.ts
 });
@@ -243,7 +243,7 @@ Group related routes under a common prefix:
 ```ts
 scope("admin", () => {
   get("/users", "users#list"); // -> src/actions/admin/users/listAction.ts
-  post("/users", "users#create"); // -> src/actions/admin/users/createAction.ts
+  post("/users", "admin/users/create"); // -> src/actions/admin/users/createAction.ts
 });
 ```
 
@@ -333,24 +333,24 @@ Examples:
 
 ```ts
 // Basic usage
-root("index#index");
-get("/users", "users#show");
-post("/users", "users#create");
-put("/users/:id", "users#update");
-patch("/users/:id", "users#patch");
-destroy("/users/:id", "users#delete");
-options("/users", "users#options");
-head("/users", "users#head");
-all("/api", "api#handle");
+root("index/index");
+get("/users", "users/list");
+post("/users", "users/create");
+put("/users/:id", "users/update");
+patch("/users/:id", "users/patch");
+destroy("/users/:id", "users/delete");
+options("/users", "users/options");
+head("/users", "users/head");
+all("/api", "api/handle");
 scope("admin", () => {
   /* routes */
 });
 
 // With middleware
 const authMiddlewares = [authenticate, logRequest];
-root([authenticate], "index#index");
-get("/users", authMiddlewares, "users#show");
-put("/users/:id", authMiddlewares, "users#update");
+root([authenticate], "index/index");
+get("/users", authMiddlewares, "users/list");
+put("/users/:id", authMiddlewares, "users/update");
 scope("admin", authMiddlewares, () => {
   /* routes */
 });
@@ -362,15 +362,15 @@ You can use regular expressions for route paths:
 
 ```ts
 // Match paths ending with 'fly'
-get(/.*fly$/, "insects#list"); // Matches: /butterfly, /dragonfly
-get(/^\/api\/v\d+\/.*$/, "api#handle"); // Matches: /api/v1/users, /api/v2/posts
+get(/.*fly$/, "insects/list"); // Matches: /butterfly, /dragonfly
+get(/^\/api\/v\d+\/.*$/, "api/handle"); // Matches: /api/v1/users, /api/v2/posts
 
 // RegExp routes with middleware
-get(/^\/secure\/.*$/, [authenticate], "secure#handle");
+get(/^\/secure\/.*$/, [authenticate], "secure/handle");
 
 // Order matters for RegExp routes too
-get(/^\/api\/v1\/users$/, "users#list"); // More specific route first
-get(/^\/api\/v1\/.*$/, "api#handle"); // General route second
+get(/^\/api\/v1\/users$/, "users/list"); // More specific route first
+get(/^\/api\/v1\/.*$/, "api/handle"); // General route second
 ```
 
 Note: When using regular expressions, the path is passed to `Express.js` as is, without any normalization.
