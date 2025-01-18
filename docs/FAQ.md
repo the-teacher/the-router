@@ -17,8 +17,8 @@ The router is inspired by Ruby on Rails' approach to route definition:
 
 ```ts
 // Rails-like syntax
-root("pages#home");
-get("/about", "pages#about");
+root("pages/home");
+get("/about", "pages/about");
 resources("posts");
 ```
 
@@ -38,14 +38,14 @@ The `resources` method automatically creates all necessary routes:
 resources("posts");
 
 // Creates routes:
-// GET    /posts          -> posts#index
-// GET    /posts/new      -> posts#new
-// POST   /posts          -> posts#create
-// GET    /posts/:id      -> posts#show
-// GET    /posts/:id/edit -> posts#edit
-// PUT    /posts/:id      -> posts#update
-// PATCH  /posts/:id      -> posts#update
-// DELETE /posts/:id      -> posts#destroy
+// GET    /posts          -> posts/index
+// GET    /posts/new      -> posts/new
+// POST   /posts          -> posts/create
+// GET    /posts/:id      -> posts/show
+// GET    /posts/:id/edit -> posts/edit
+// PUT    /posts/:id      -> posts/update
+// PATCH  /posts/:id      -> posts/update
+// DELETE /posts/:id      -> posts/destroy
 ```
 
 ## What's common with Hanami?
@@ -97,8 +97,8 @@ export const perform = (req: Request, res: Response) => {
 // routes/index.ts
 import { root, get, resources } from "@the-teacher/the-router";
 
-root("pages#home");
-get("/about", "pages#about");
+root("pages/home");
+get("/about", "pages/about");
 resources("posts");
 ```
 
@@ -142,7 +142,7 @@ src/
 // src/routes/index.ts
 import { root, get, resources } from "@the-teacher/the-router";
 
-root("pages#home");
+root("pages/home");
 resources("posts");
 ```
 
@@ -179,7 +179,7 @@ Routes can be grouped using `scope`:
 
 ```ts
 scope("admin", () => {
-  get("/dashboard", "admin#dashboard"); // /admin/dashboard
+  get("/dashboard", "admin/dashboard"); // /admin/dashboard
 
   resources("posts"); // /admin/posts
   resources("users"); // /admin/users
@@ -220,7 +220,7 @@ const authenticate = (req: Request, res: Response, next: Function) => {
 };
 
 // Apply to single route
-get("/profile", [authenticate], "users#profile");
+get("/profile", [authenticate], "users/profile");
 
 // Apply to route group
 scope("admin", [authenticate], () => {
@@ -236,7 +236,7 @@ If you use multiple middleware, it's recommended to create an array beforehand:
 ```ts
 const permissionsMiddlewares = [authenticate, requireOwner, requireEditorRole];
 
-get("/profile", permissionsMiddlewares, "users#profile");
+get("/profile", permissionsMiddlewares, "users/profile");
 ```
 
 ### Regular Expressions
@@ -427,7 +427,7 @@ test("requires authentication", async () => {
   };
 
   // Add middleware to route
-  get("/profile", [authenticate], "users#profile");
+  get("/profile", [authenticate], "users/profile");
 
   // Test without token
   await request(app).get("/profile").expect(401);

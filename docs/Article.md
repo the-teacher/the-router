@@ -23,11 +23,11 @@
 import { root, get, post, scope, resources } from "@the-teacher/the-router";
 
 // Root route
-root("index#home");
+root("index/home");
 
 // Basic routes
-get("/about", "pages#about");
-post("/contact", "pages#contact");
+get("/about", "pages/about");
+post("/contact", "pages/contact");
 
 // Resource routes
 resources("posts");
@@ -36,6 +36,7 @@ resources("posts");
 scope("admin", [authenticate], () => {
   resources("users");
   resources("posts");
+  get("/stats", "dashboard/stats");
 });
 ```
 
@@ -258,7 +259,7 @@ The router provides a flexible middleware system that operates at multiple level
    - Applied to individual routes
    - Highest precedence
    ```ts
-   get("/posts/:id", [cacheResponse], "posts#show");
+   get("/posts/:id", [cacheResponse], "posts/show");
    ```
 
 ### Type Safety

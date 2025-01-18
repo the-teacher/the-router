@@ -17,8 +17,8 @@ Express.js предоставляет базовый роутер, но его �
 
 ```ts
 // Rails-подобный синтаксис
-root("pages#home");
-get("/about", "pages#about");
+root("pages/home");
+get("/about", "pages/about");
 resources("posts");
 ```
 
@@ -38,14 +38,14 @@ resources("posts");
 resources("posts");
 
 // Создаст маршруты:
-// GET    /posts          -> posts#index
-// GET    /posts/new      -> posts#new
-// POST   /posts          -> posts#create
-// GET    /posts/:id      -> posts#show
-// GET    /posts/:id/edit -> posts#edit
-// PUT    /posts/:id      -> posts#update
-// PATCH  /posts/:id      -> posts#update
-// DELETE /posts/:id      -> posts#destroy
+// GET    /posts          -> posts/index
+// GET    /posts/new      -> posts/new
+// POST   /posts          -> posts/create
+// GET    /posts/:id      -> posts/show
+// GET    /posts/:id/edit -> posts/edit
+// PUT    /posts/:id      -> posts/update
+// PATCH  /posts/:id      -> posts/update
+// DELETE /posts/:id      -> posts/destroy
 ```
 
 ## Что общего с Hanami?
@@ -97,8 +97,8 @@ export const perform = (req: Request, res: Response) => {
 // routes/index.ts
 import { root, get, resources } from "@the-teacher/the-router";
 
-root("pages#home");
-get("/about", "pages#about");
+root("pages/home");
+get("/about", "pages/about");
 resources("posts");
 ```
 
@@ -142,7 +142,7 @@ src/
 // src/routes/index.ts
 import { root, get, resources } from "@the-teacher/the-router";
 
-root("pages#home");
+root("pages/home");
 resources("posts");
 ```
 
@@ -179,7 +179,7 @@ app.listen(3000, () => {
 
 ```ts
 scope("admin", () => {
-  get("/dashboard", "admin#dashboard"); // /admin/dashboard
+  get("/dashboard", "admin/dashboard"); // /admin/dashboard
 
   resources("posts"); // /admin/posts
   resources("users"); // /admin/users
@@ -191,7 +191,7 @@ scope("admin", () => {
 Middleware можно применять к отдельным маршрутам или группам:
 
 ```ts
-get("/profile", [authenticate], "users#profile");
+get("/profile", [authenticate], "users/profile");
 
 scope("admin", [authenticate, requireAdmin], () => {
   // Все маршруты требуют аутентификации и прав админа
@@ -204,7 +204,7 @@ scope("admin", [authenticate, requireAdmin], () => {
 ```ts
 const permissionsMiddlewares = [authenticate, requireOwner, requireEditorRole];
 
-get("/profile", permissionsMiddlewares, "users#profile");
+get("/profile", permissionsMiddlewares, "users/profile");
 ```
 
 ### Регулярные выражения
@@ -385,7 +385,7 @@ const authenticate = (req: Request, res: Response, next: Function) => {
 };
 
 // Применение к отдельному маршруту
-get("/profile", [authenticate], "users#profile");
+get("/profile", [authenticate], "users/profile");
 
 // Применение к группе маршрутов
 scope("admin", [authenticate], () => {
@@ -515,7 +515,7 @@ test("requires authentication", async () => {
   };
 
   // Добавляем middleware к маршруту
-  get("/profile", [authenticate], "users#profile");
+  get("/profile", [authenticate], "users/profile");
 
   // Тест без токена
   await request(app).get("/profile").expect(401);

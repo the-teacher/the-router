@@ -35,8 +35,8 @@
 
    ```ts
    // Ясно и самодокументированно
-   root("pages#home");
-   get("/about", "pages#about");
+   root("pages/home");
+   get("/about", "pages/about");
    resources("posts");
    ```
 
@@ -46,12 +46,12 @@
    // Логическая группировка с общим middleware
    scope("admin", [authenticate], () => {
      resources("users");
-     get("/stats", "dashboard#stats");
+     get("/stats", "dashboard/stats");
    });
    ```
 
 3. **Отображение на основе соглашений**
-   - Маршрут `"posts#show"` отображается в `actions/posts/showAction.ts`
+   - Маршрут `"posts/show"` отображается в `actions/posts/showAction.ts`
    - Область `"admin"` добавляет префикс к URL и пути действия
    - Ресурсы создают стандартизированные RESTful маршруты
 
@@ -78,7 +78,7 @@
    - Применяется к отдельным маршрутам
    - Имеет наивысший приоритет
    ```ts
-   get("/posts/:id", [cacheResponse], "posts#show");
+   get("/posts/:id", [cacheResponse], "posts/show");
    ```
 
 ### Типобезопасность
