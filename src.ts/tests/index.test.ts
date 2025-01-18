@@ -208,7 +208,11 @@ describe("Routes", () => {
     });
 
     test("should handle middleware for new methods", async () => {
-      const authenticate = (req: any, res: any, next: any) => {
+      const authenticate = (
+        req: Request,
+        res: Response,
+        next: NextFunction
+      ) => {
         const auth = req.headers.authorization;
         if (auth === "Bearer valid-token") {
           next();
@@ -279,7 +283,11 @@ describe("Routes", () => {
     });
 
     test("should handle RegExp routes with middleware", async () => {
-      const authenticate = (req: any, res: any, next: any) => {
+      const authenticate = (
+        req: Request,
+        res: Response,
+        next: NextFunction
+      ) => {
         const auth = req.headers.authorization;
         if (auth === "Bearer valid-token") {
           next();
@@ -419,7 +427,11 @@ describe("Routes", () => {
         resources("posts");
       });
 
-      const authenticate = (req: any, res: any, next: any) => {
+      const authenticate = (
+        req: Request,
+        res: Response,
+        next: NextFunction
+      ) => {
         const auth = req.headers.authorization;
         if (auth === "Bearer valid-token") {
           next();
