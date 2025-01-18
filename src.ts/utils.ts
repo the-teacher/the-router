@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { getActionsPath, isCustomActionsPath } from "./base";
+import type { Request, Response } from "express";
 
 const VALID_EXTENSIONS = [".js", ".ts"];
 export const getProjectRoot = () => process.cwd();
@@ -43,7 +44,10 @@ const validateActionFile = (
   throw new Error(`Action file ${fullActionPath} does not exist`);
 };
 
-const validateActionModule = (actionModule: any, fullActionPath: string) => {
+const validateActionModule = (
+  actionModule: { perform?: unknown },
+  fullActionPath: string
+) => {
   if (typeof actionModule.perform !== "function") {
     throw new Error(
       `Action module at ${fullActionPath} must export a 'perform' function`
@@ -73,12 +77,12 @@ export const loadActionImplementation = (actionPath: string) => {
 export const loadAction = (actionPath: string) => {
   try {
     return loadActionImplementation(actionPath);
-  } catch (error: any) {
-    return (_req: any, res: any) => {
+  } catch (error: Error | unknown) {
+    return (req: Request, res: Response) => {
       res.status(501).json({
         error: "Action loading failed",
         message: "Failed to load the specified action",
-        details: error.message,
+        details: error instanceof Error ? error.message : "Unknown error",
       });
     };
   }
