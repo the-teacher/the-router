@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import request from "supertest";
 import path from "path";
 
@@ -107,7 +107,11 @@ describe("Scoped Routes with Middlewares", () => {
 
 describe("Middleware Tests", () => {
   test("middleware example", () => {
-    const testMiddleware = (_req: any, _res: any, next: any) => next();
+    const testMiddleware = (
+      _req: Request,
+      _res: Response,
+      next: NextFunction
+    ) => next();
     get("/path", [testMiddleware], "some/action");
   });
 });
@@ -123,5 +127,12 @@ describe("Middleware", () => {
     const router = getRouter();
     expect(router.stack?.length).toBe(1);
     expect(router.stack?.[0]?.route?.stack?.length).toBe(2); // middleware + action
+  });
+
+  test("route without middleware should have stack length 1", () => {
+    get("/users", "users/show");
+    const router = getRouter();
+    expect(router.stack?.length).toBe(1);
+    expect(router.stack?.[0]?.route?.stack?.length).toBe(1); // only action
   });
 });

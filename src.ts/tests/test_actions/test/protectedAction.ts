@@ -1,8 +1,9 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+import { TestRequest } from "../../types";
 
-export const perform = (req: Request, res: Response) => {
+export const perform = (req: TestRequest, res: Response) => {
   return res.json({
-    testData: (req as any).testData,
+    testData: req.testData,
     message: "Protected resource accessed",
   });
 };

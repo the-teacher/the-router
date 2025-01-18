@@ -2,6 +2,7 @@ import path from "path";
 import { getRouter } from "../base";
 import { loadAction } from "../utils";
 import { getActionsPath, setActionsPath, resetRouter } from "../base";
+import { Request, Response } from "express";
 
 describe("Utils", () => {
   beforeEach(() => {
@@ -96,12 +97,12 @@ describe("Utils", () => {
     });
 
     test("should return error handler for undefined action path", async () => {
-      const handler = loadAction(undefined as any);
-      const req = {};
+      const handler = loadAction(undefined as unknown as string);
+      const req = {} as Request;
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
-      };
+      } as unknown as Response;
 
       await handler(req, res);
 

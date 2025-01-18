@@ -1,18 +1,20 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
+import { RequestHandler } from "express";
+import { TestRequest } from "../types";
 
 // Test middleware that adds data to request
 export const addDataMiddleware = (
-  req: Request,
-  _res: Response,
+  req: TestRequest,
+  res: Response,
   next: NextFunction
 ) => {
-  (req as any).testData = "middleware data";
+  req.testData = "middleware data";
   next();
 };
 
 // Test middleware that checks authorization
-export const authMiddleware = (
-  req: Request,
+export const authMiddleware: RequestHandler = (
+  req: TestRequest,
   res: Response,
   next: NextFunction
 ) => {
