@@ -1,7 +1,6 @@
 import express from "express";
 import request from "supertest";
 import path from "path";
-import { authenticate } from "./test_middlewares/auth";
 
 import {
   root,
@@ -120,7 +119,7 @@ describe("Middleware", () => {
   });
 
   test("should apply middleware to route", () => {
-    get("/users", [authenticate], "users/show");
+    get("/users", [authMiddleware], "users/show");
     const router = getRouter();
     expect(router.stack?.length).toBe(1);
     expect(router.stack?.[0]?.route?.stack?.length).toBe(2); // middleware + action
