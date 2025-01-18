@@ -3,26 +3,23 @@ import { getActionsPath, isCustomActionsPath } from "./base";
 
 export const getProjectRoot = () => process.cwd();
 
-export const parseScopeActionString = (scopeActionString: string) => {
-  const [scope, action] = scopeActionString.split("#");
-  if (!scope || !action) {
-    throw new Error(
-      `Invalid format for scope action: ${scopeActionString}. Expected format is 'scope#action'.`
-    );
+export const normalizeActionPath = (actionPath: string) => {
+  if (!actionPath) {
+    throw new Error("Action path cannot be empty");
   }
-  return { scope, action };
+  return actionPath;
 };
 
-export const buildActionPath = (scope: string, action: string) => {
+export const buildActionPath = (actionPath: string) => {
   const actionsPath = getActionsPath();
-  const normalizedScope = scope.replace(/\//g, path.sep);
-  const actionFile = `${action}Action`;
+  const normalizedPath = normalizeActionPath(actionPath);
+  const actionFile = `${normalizedPath}Action`;
 
   if (!isCustomActionsPath()) {
-    return path.join(process.cwd(), actionsPath, normalizedScope, actionFile);
+    return path.join(process.cwd(), actionsPath, actionFile);
   }
 
-  return path.join(actionsPath, normalizedScope, actionFile);
+  return path.join(actionsPath, actionFile);
 };
 
 export const loadAction = (actionPath: string) => {
@@ -38,6 +35,11 @@ export const loadAction = (actionPath: string) => {
     return actionModule.perform;
   } catch (error: any) {
     if (error.code === "MODULE_NOT_FOUND") {
+      const match = actionPath.match(/\/([^/]+\/)*([^/]+)Action$/);
+      const actionName = match
+        ? match[0].replace(/^\//, "").replace("Action", "")
+        : actionPath;
+
       console.error(`[WARNING] Action file not found: ${actionPath}`);
       console.error(
         `[WARNING] Please create action file with 'perform' function`
@@ -46,7 +48,7 @@ export const loadAction = (actionPath: string) => {
       return (_req: any, res: any) => {
         res.status(501).json({
           error: "Not Implemented",
-          message: `Action handler not found: ${actionPath}`,
+          message: `Action handler not found: ${actionName}`,
           details: "The requested action has not been implemented yet",
         });
       };

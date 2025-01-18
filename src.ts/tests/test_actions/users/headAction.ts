@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
 
-export const perform = (req: Request, res: Response) => {
-  res.header("X-Total-Count", "42").send();
+export const perform = (_req: Request, res: Response) => {
+  res.status(200).send();
 };

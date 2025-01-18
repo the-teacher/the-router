@@ -13,6 +13,7 @@ import {
 } from "../index";
 
 import { addDataMiddleware, authMiddleware } from "./middlewares";
+import { loadAction, buildActionPath } from "../utils";
 
 describe("Routes with Middlewares", () => {
   beforeEach(() => {
@@ -21,7 +22,7 @@ describe("Routes with Middlewares", () => {
   });
 
   test("should work with root route", async () => {
-    root([addDataMiddleware], "index#index");
+    root([addDataMiddleware], "index/index");
 
     const app = express();
     app.use(getRouter());
@@ -31,7 +32,7 @@ describe("Routes with Middlewares", () => {
   });
 
   test("should work with POST routes", async () => {
-    post("/secure-post", [authMiddleware], "test#post");
+    post("/secure-post", [authMiddleware], "test/post");
 
     const app = express();
     app.use(getRouter());
@@ -58,8 +59,8 @@ describe("Scoped Routes with Middlewares", () => {
 
   test("should apply scope middleware to all routes within scope", async () => {
     scope("admin", [authMiddleware], () => {
-      get("/show", "admin#show");
-      post("/update", "admin#update");
+      get("/show", "admin/show");
+      post("/update", "admin/update");
     });
 
     const app = express();
@@ -86,7 +87,7 @@ describe("Scoped Routes with Middlewares", () => {
 
   test("should combine scope and route middleware", async () => {
     scope("admin", [authMiddleware], () => {
-      get("/show", [addDataMiddleware], "admin#show");
+      get("/show", [addDataMiddleware], "admin/show");
     });
 
     const app = express();
@@ -102,5 +103,12 @@ describe("Scoped Routes with Middlewares", () => {
       .set("Authorization", "Bearer valid-token");
 
     expect(successResponse.status).toBe(200);
+  });
+});
+
+describe("Middleware Tests", () => {
+  test("middleware example", () => {
+    const testMiddleware = (_req: any, _res: any, next: any) => next();
+    get("/path", [testMiddleware], "some/action");
   });
 });

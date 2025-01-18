@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 
-export const perform = (req: Request, res: Response) => {
-  res.json({ message: `Handled ${req.method} request` });
+export const perform = (_req: Request, res: Response) => {
+  res.status(200).json({
+    message: "API handler",
+  });
 };

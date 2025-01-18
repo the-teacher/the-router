@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
 
-export const perform = (req: Request, res: Response) => {
-  res.header("Allow", "GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD").send();
+export const perform = (_req: Request, res: Response) => {
+  res.status(200).header("Allow", "GET, POST, PUT, DELETE, OPTIONS").send();
 };

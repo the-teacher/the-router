@@ -1,12 +1,7 @@
 import path from "path";
 import { getRouter } from "../base";
-import { parseScopeActionString, buildActionPath, loadAction } from "../utils";
-import {
-  getActionsPath,
-  setActionsPath,
-  resetRouter,
-  setRouterScope,
-} from "../base";
+import { normalizeActionPath, buildActionPath, loadAction } from "../utils";
+import { getActionsPath, setActionsPath, resetRouter } from "../base";
 
 describe("Utils", () => {
   beforeEach(() => {
@@ -14,87 +9,46 @@ describe("Utils", () => {
     setActionsPath(path.join(__dirname, "./test_actions"));
   });
 
-  describe("parseScopeActionString", () => {
-    test("should correctly parse scope and action", () => {
-      const result = parseScopeActionString("users#show");
-      expect(result).toEqual({ scope: "users", action: "show" });
+  describe("normalizeActionPath", () => {
+    test("should normalize action path", () => {
+      const result = normalizeActionPath("users/show");
+      expect(result).toBe("users/show");
     });
 
-    test("should throw an error for an invalid format (missing action)", () => {
+    test("should throw error for empty path", () => {
       expect(() => {
-        parseScopeActionString("user#");
-      }).toThrow(
-        "Invalid format for scope action: user#. Expected format is 'scope#action'."
-      );
-    });
-
-    test("should throw an error for an invalid format (missing controller)", () => {
-      const input = "#create";
-
-      expect(() => {
-        parseScopeActionString(input);
-      }).toThrow(
-        "Invalid format for scope action: #create. Expected format is 'scope#action'."
-      );
-    });
-
-    test("should throw an error for an empty string", () => {
-      const input = "";
-
-      expect(() => {
-        parseScopeActionString(input);
-      }).toThrow(
-        "Invalid format for scope action: . Expected format is 'scope#action'."
-      );
-    });
-
-    test('should throw an error for a string without a "#" separator', () => {
-      const input = "usercreate";
-
-      expect(() => {
-        parseScopeActionString(input);
-      }).toThrow(
-        "Invalid format for scope action: usercreate. Expected format is 'scope#action'."
-      );
+        normalizeActionPath("");
+      }).toThrow("Action path cannot be empty");
     });
   });
 
   describe("buildActionPath", () => {
     test("should build correct path without scope", () => {
-      const result = buildActionPath("users", "show");
+      const result = buildActionPath("users/show");
       expect(result).toContain("/test_actions/users/showAction");
     });
   });
 
   describe("loadAction", () => {
     test("should load existing action", () => {
-      const scopeName = "test";
-      const action = "get";
-
-      const actionPath = buildActionPath(scopeName, action);
+      const actionPath = buildActionPath("test/get");
       const handler = loadAction(actionPath);
       expect(typeof handler).toBe("function");
       expect(console.error).not.toHaveBeenCalled();
     });
 
     test("should return fallback handler for non-existent action", async () => {
-      const scopeName = "test";
-      const action = "nonExistent";
-
-      const actionPath = buildActionPath(scopeName, action);
+      const actionPath = buildActionPath("test/nonExistent");
       const handler = loadAction(actionPath);
 
-      // Create mocks for req and res
       const req = {};
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       };
 
-      // Call the handler
       await handler(req, res);
 
-      // Verify console.error was called with correct messages
       expect(console.error).toHaveBeenCalledTimes(2);
       expect(console.error).toHaveBeenNthCalledWith(
         1,
@@ -105,11 +59,10 @@ describe("Utils", () => {
         expect.stringContaining("Please create action file")
       );
 
-      // Verify that response was sent with 501 status code
       expect(res.status).toHaveBeenCalledWith(501);
       expect(res.json).toHaveBeenCalledWith({
         error: "Not Implemented",
-        message: expect.stringContaining("nonExistentAction"),
+        message: expect.stringContaining("test/nonExistent"),
         details: "The requested action has not been implemented yet",
       });
     });

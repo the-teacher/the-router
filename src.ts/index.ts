@@ -10,28 +10,26 @@ import {
   setRouterOptions,
 } from "./base";
 
-import { parseScopeActionString, loadAction, buildActionPath } from "./utils";
+import { loadAction, buildActionPath } from "./utils";
 
 export const root = (
   middlewares: RequestHandler[] | string,
-  scopeAction?: string
+  actionPath?: string
 ) => {
   let handlers: RequestHandler[] = [...getScopeMiddlewares()];
-  let actionString: string;
+  let finalActionPath: string;
 
   if (Array.isArray(middlewares)) {
-    if (!scopeAction)
-      throw new Error(
-        "Action string is required when middlewares are provided"
-      );
+    if (!actionPath) {
+      throw new Error("Action path is required when middlewares are provided");
+    }
     handlers = [...handlers, ...middlewares];
-    actionString = scopeAction;
+    finalActionPath = actionPath;
   } else {
-    actionString = middlewares;
+    finalActionPath = middlewares;
   }
 
-  const { scope, action } = parseScopeActionString(actionString);
-  handlers.push(loadActionHandler(scope, action));
+  handlers.push(loadActionHandler(finalActionPath));
 
   getRouter().get("/", ...handlers);
 };
@@ -41,24 +39,24 @@ const createRouteHandler =
   (
     urlPath: string | RegExp,
     middlewares: RequestHandler[] | string,
-    scopeAction?: string
+    actionPath?: string
   ) => {
     let handlers: RequestHandler[] = [...getScopeMiddlewares()];
-    let actionString: string;
+    let finalActionPath: string;
 
     if (Array.isArray(middlewares)) {
-      if (!scopeAction)
+      if (!actionPath) {
         throw new Error(
-          "Action string is required when middlewares are provided"
+          "Action path is required when middlewares are provided"
         );
+      }
       handlers = [...handlers, ...middlewares];
-      actionString = scopeAction;
+      finalActionPath = actionPath;
     } else {
-      actionString = middlewares;
+      finalActionPath = middlewares;
     }
 
-    const { scope, action } = parseScopeActionString(actionString);
-    handlers.push(loadActionHandler(scope, action));
+    handlers.push(loadActionHandler(finalActionPath));
 
     const router = getRouter();
     const path =
@@ -212,11 +210,12 @@ export const resources = (
 // Helper function to create handlers array
 const createHandlers = (
   middlewares: RequestHandler[],
-  scope: string,
+  resourcePath: string,
   action: string
 ): RequestHandler[] => {
   const handlers = [...getScopeMiddlewares(), ...middlewares];
-  handlers.push(loadActionHandler(scope, action));
+  const fullActionPath = `${resourcePath}/${action}`;
+  handlers.push(loadActionHandler(fullActionPath));
   return handlers;
 };
 
@@ -232,7 +231,6 @@ export {
   setRouterOptions,
 };
 
-const loadActionHandler = (scope: string, action: string) => {
-  const actionPath = buildActionPath(scope, action);
-  return loadAction(actionPath);
+const loadActionHandler = (actionPath: string) => {
+  return loadAction(buildActionPath(actionPath));
 };

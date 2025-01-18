@@ -29,9 +29,9 @@ describe("Routes", () => {
 
   describe("Basic routes", () => {
     beforeEach(() => {
-      root("index#index");
-      get("/get", "test#get");
-      post("/post", "test#post");
+      root("index/index");
+      get("/get", "test/get");
+      post("/post", "test/post");
     });
 
     test("should return the correct response for the root route", async () => {
@@ -62,8 +62,8 @@ describe("Routes", () => {
   describe("Scoped routes", () => {
     beforeEach(() => {
       scope("admin", () => {
-        get("show", "admin#show");
-        post("update", "admin#update");
+        get("show", "admin/show");
+        post("update", "admin/update");
       });
     });
 
@@ -97,8 +97,8 @@ describe("Routes", () => {
       resetRouter();
       setActionsPath(path.join(__dirname, "./test_actions"));
 
-      get("/users/:id", "test#getUser");
-      post("/users/:id", "test#updateUser");
+      get("/users/:id", "users/get");
+      post("/users/:id", "users/update");
     });
 
     test("should handle route parameters in GET request", async () => {
@@ -138,7 +138,7 @@ describe("Routes", () => {
 
   describe("HTTP Methods", () => {
     test("should handle PUT requests", async () => {
-      put("/users/1", "users#update");
+      put("/users/1", "users/update");
 
       const app = express();
       app.use(getRouter());
@@ -148,7 +148,7 @@ describe("Routes", () => {
     });
 
     test("should handle PATCH requests", async () => {
-      patch("/users/1", "users#patch");
+      patch("/users/1", "users/update");
 
       const app = express();
       app.use(getRouter());
@@ -158,7 +158,7 @@ describe("Routes", () => {
     });
 
     test("should handle DELETE requests", async () => {
-      destroy("/users/1", "users#delete");
+      destroy("/users/1", "users/update");
 
       const app = express();
       app.use(getRouter());
@@ -168,7 +168,7 @@ describe("Routes", () => {
     });
 
     test("should handle OPTIONS requests", async () => {
-      options("/users", "users#options");
+      options("/users", "users/options");
 
       const app = express();
       app.use(getRouter());
@@ -178,7 +178,7 @@ describe("Routes", () => {
     });
 
     test("should handle HEAD requests", async () => {
-      head("/users", "users#head");
+      head("/users", "users/head");
 
       const app = express();
       app.use(getRouter());
@@ -188,7 +188,7 @@ describe("Routes", () => {
     });
 
     test("should handle ALL method", async () => {
-      all("/api", "api#handle");
+      all("/api", "api/handle");
 
       const app = express();
       app.use(getRouter());
@@ -217,9 +217,9 @@ describe("Routes", () => {
         }
       };
 
-      put("/users/1", [authenticate], "users#update");
-      patch("/users/1", [authenticate], "users#patch");
-      destroy("/users/1", [authenticate], "users#delete");
+      put("/users/1", [authenticate], "users/update");
+      patch("/users/1", [authenticate], "users/update");
+      destroy("/users/1", [authenticate], "users/update");
 
       const app = express();
       app.use(getRouter());
@@ -259,7 +259,7 @@ describe("Routes", () => {
     });
 
     test("should handle routes with RegExp patterns", async () => {
-      get(/.*fly$/, "test#regexp");
+      get(/.*fly$/, "test/regexp");
 
       const app = express();
       app.use(getRouter());
@@ -288,7 +288,7 @@ describe("Routes", () => {
         }
       };
 
-      get(/^\/secure\/.*$/, [authenticate], "test#regexp");
+      get(/^\/secure\/.*$/, [authenticate], "secure/handle");
 
       const app = express();
       app.use(getRouter());
@@ -306,8 +306,8 @@ describe("Routes", () => {
     });
 
     test("should handle multiple RegExp routes in correct order", async () => {
-      get(/^\/api\/v1\/.*$/, "test#regexp"); // Matches all /api/v1/ paths
-      get(/^\/api\/v1\/users$/, "test#regexp"); // Should never match due to order
+      get(/^\/api\/v1\/users$/, "api/v1/users");
+      get(/^\/api\/v1\/.*$/, "api/v1/default");
 
       const app = express();
       app.use(getRouter());
@@ -680,7 +680,7 @@ describe("Routes", () => {
 
   describe("Missing Action Tests", () => {
     test("should return 501 when action file does not exist", async () => {
-      root("non_existent#index");
+      root("non_existent/index");
 
       const app = express();
       app.use(getRouter());
@@ -689,14 +689,14 @@ describe("Routes", () => {
       expect(response.status).toBe(501);
       expect(response.body).toEqual({
         error: "Not Implemented",
-        message: expect.stringContaining("non_existent/indexAction"),
+        message: expect.stringContaining("non_existent/index"),
         details: expect.any(String),
       });
     });
 
     test("should return 501 for missing action in scope", async () => {
       scope("admin", () => {
-        get("/users", "missing#list");
+        get("/users", "admin/missing/list");
       });
 
       const app = express();
@@ -706,7 +706,7 @@ describe("Routes", () => {
       expect(response.status).toBe(501);
       expect(response.body).toEqual({
         error: "Not Implemented",
-        message: expect.stringContaining("missing/listAction"),
+        message: expect.stringContaining("admin/missing/list"),
         details: expect.any(String),
       });
     });
