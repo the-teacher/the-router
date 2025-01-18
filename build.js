@@ -5,7 +5,7 @@ const isWatch = process.argv.includes("--watch");
 
 /** @type {import('esbuild').BuildOptions} */
 const config = {
-  entryPoints: ["src.ts/index.ts"],
+  entryPoints: ["src.ts/index.ts", "src.ts/bin/the-router.ts"],
   bundle: true,
   outdir: "src",
   platform: "node",

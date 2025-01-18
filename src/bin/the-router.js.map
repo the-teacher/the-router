@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src.ts/bin/the-router.ts"],
+  "sourcesContent": ["#!/usr/bin/env node\n/* eslint-disable no-console */\n\nexport const parseArgs = (args: string[]) => {\n  const options: Record<string, string> = {};\n\n  args.slice(2).forEach((arg) => {\n    if (arg.includes(\"=\")) {\n      const [key, value] = arg.split(\"=\");\n      options[key] = value;\n    }\n  });\n\n  return options;\n};\n\nexport const sync = (options: Record<string, string>) => {\n  console.log(\"Hello World!\");\n  console.log(\"Provided options:\", options);\n};\n\nif (require.main === module) {\n  const command = process.argv[2];\n  const options = parseArgs(process.argv);\n\n  if (command === \"sync\") {\n    sync(options);\n  } else {\n    console.log(\"Unknown command. Available commands: sync\");\n    process.exit(1);\n  }\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAGO,IAAM,YAAY,CAAC,SAAmB;AAC3C,QAAM,UAAkC,CAAC;AAEzC,OAAK,MAAM,CAAC,EAAE,QAAQ,CAAC,QAAQ;AAC7B,QAAI,IAAI,SAAS,GAAG,GAAG;AACrB,YAAM,CAAC,KAAK,KAAK,IAAI,IAAI,MAAM,GAAG;AAClC,cAAQ,GAAG,IAAI;AAAA,IACjB;AAAA,EACF,CAAC;AAED,SAAO;AACT;AAEO,IAAM,OAAO,CAAC,YAAoC;AACvD,UAAQ,IAAI,cAAc;AAC1B,UAAQ,IAAI,qBAAqB,OAAO;AAC1C;AAEA,IAAI,QAAQ,SAAS,QAAQ;AAC3B,QAAM,UAAU,QAAQ,KAAK,CAAC;AAC9B,QAAM,UAAU,UAAU,QAAQ,IAAI;AAEtC,MAAI,YAAY,QAAQ;AACtB,SAAK,OAAO;AAAA,EACd,OAAO;AACL,YAAQ,IAAI,2CAA2C;AACvD,YAAQ,KAAK,CAAC;AAAA,EAChB;AACF;",
+  "names": []
+}

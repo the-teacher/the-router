@@ -112,85 +112,95 @@ var routeScope = (scope2, middlewaresOrCallback, routesDefinitionCallback) => {
 };
 
 // src.ts/utils.ts
+var import_fs = __toESM(require("fs"));
 var import_path = __toESM(require("path"));
-var parseScopeActionString = (scopeActionString) => {
-  const [scope2, action] = scopeActionString.split("#");
-  if (!scope2 || !action) {
+var VALID_EXTENSIONS = [".js", ".ts"];
+var getProjectRoot = () => process.cwd();
+var validateActionsPath = (actionsPath2) => {
+  if (!actionsPath2) {
+    throw new Error("Actions path is not set");
+  }
+  if (!import_fs.default.statSync(actionsPath2).isDirectory()) {
+    throw new Error(`Actions path ${actionsPath2} is not a directory`);
+  }
+};
+var resolveFullActionPath = (actionsPath2, actionPath) => {
+  if (!actionPath) {
+    throw new Error("Action path cannot be empty");
+  }
+  const actionFile = `${actionPath}Action`;
+  return !isCustomActionsPath() ? import_path.default.join(getProjectRoot(), actionsPath2, actionFile) : import_path.default.join(actionsPath2, actionFile);
+};
+var validateActionFile = (fullActionPath, validExtensions) => {
+  for (const ext of validExtensions) {
+    const candidatePath = `${fullActionPath}${ext}`;
+    if (import_fs.default.existsSync(candidatePath) && import_fs.default.statSync(candidatePath).isFile()) {
+      return candidatePath;
+    }
+  }
+  throw new Error(`Action file ${fullActionPath} does not exist`);
+};
+var validateActionModule = (actionModule, fullActionPath) => {
+  if (typeof actionModule.perform !== "function") {
     throw new Error(
-      `Invalid format for scope action: ${scopeActionString}. Expected format is 'scope#action'.`
+      `Action module at ${fullActionPath} must export a 'perform' function`
     );
   }
-  return { scope: scope2, action };
 };
-var buildActionPath = (scope2, action) => {
+var loadActionImplementation = (actionPath) => {
   const actionsPath2 = getActionsPath();
-  const normalizedScope = scope2.replace(/\//g, import_path.default.sep);
-  const actionFile = `${action}Action`;
-  if (!isCustomActionsPath()) {
-    return import_path.default.join(process.cwd(), actionsPath2, normalizedScope, actionFile);
-  }
-  return import_path.default.join(actionsPath2, normalizedScope, actionFile);
+  validateActionsPath(actionsPath2);
+  const fullActionPath = resolveFullActionPath(actionsPath2, actionPath);
+  const validActionPath = validateActionFile(fullActionPath, VALID_EXTENSIONS);
+  const actionModule = require(validActionPath);
+  validateActionModule(actionModule, validActionPath);
+  return actionModule.perform;
 };
 var loadAction = (actionPath) => {
   try {
-    const actionModule = require(actionPath);
-    if (typeof actionModule.perform !== "function") {
-      throw new Error(
-        `Action module at ${actionPath} must export a 'perform' function`
-      );
-    }
-    return actionModule.perform;
+    return loadActionImplementation(actionPath);
   } catch (error) {
-    if (error.code === "MODULE_NOT_FOUND") {
-      console.error(`[WARNING] Action file not found: ${actionPath}`);
-      console.error(
-        `[WARNING] Please create action file with 'perform' function`
-      );
-      return (_req, res) => {
-        res.status(501).json({
-          error: "Not Implemented",
-          message: `Action handler not found: ${actionPath}`,
-          details: "The requested action has not been implemented yet"
-        });
-      };
-    }
-    throw error;
+    return (req, res) => {
+      res.status(501).json({
+        error: "Action loading failed",
+        message: "Failed to load the specified action",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    };
   }
 };
 
 // src.ts/index.ts
-var root = (middlewares, scopeAction) => {
+var root = (middlewares, actionPath) => {
   let handlers = [...getScopeMiddlewares()];
-  let actionString;
+  let finalActionPath;
   if (Array.isArray(middlewares)) {
-    if (!scopeAction)
-      throw new Error(
-        "Action string is required when middlewares are provided"
-      );
+    if (!actionPath) {
+      throw new Error("Action path is required when middlewares are provided");
+    }
     handlers = [...handlers, ...middlewares];
-    actionString = scopeAction;
+    finalActionPath = actionPath;
   } else {
-    actionString = middlewares;
+    finalActionPath = middlewares;
   }
-  const { scope: scope2, action } = parseScopeActionString(actionString);
-  handlers.push(loadActionHandler(scope2, action));
+  handlers.push(loadAction(finalActionPath));
   getRouter().get("/", ...handlers);
 };
-var createRouteHandler = (method) => (urlPath, middlewares, scopeAction) => {
+var createRouteHandler = (method) => (urlPath, middlewares, actionPath) => {
   let handlers = [...getScopeMiddlewares()];
-  let actionString;
+  let finalActionPath;
   if (Array.isArray(middlewares)) {
-    if (!scopeAction)
+    if (!actionPath) {
       throw new Error(
-        "Action string is required when middlewares are provided"
+        "Action path is required when middlewares are provided"
       );
+    }
     handlers = [...handlers, ...middlewares];
-    actionString = scopeAction;
+    finalActionPath = actionPath;
   } else {
-    actionString = middlewares;
+    finalActionPath = middlewares;
   }
-  const { scope: scope2, action } = parseScopeActionString(actionString);
-  handlers.push(loadActionHandler(scope2, action));
+  handlers.push(loadAction(finalActionPath));
   const router2 = getRouter();
   const path2 = urlPath instanceof RegExp ? urlPath : urlPath.startsWith("/") ? urlPath : `/${urlPath}`;
   switch (method) {
@@ -305,16 +315,13 @@ var resources = (resourceName, middlewaresOrOptions, options2) => {
     );
   }
 };
-var createHandlers = (middlewares, scope2, action) => {
+var createHandlers = (middlewares, resourcePath, action) => {
   const handlers = [...getScopeMiddlewares(), ...middlewares];
-  handlers.push(loadActionHandler(scope2, action));
+  const fullActionPath = `${resourcePath}/${action}`;
+  handlers.push(loadAction(fullActionPath));
   return handlers;
 };
 var scope = routeScope;
-var loadActionHandler = (scope2, action) => {
-  const actionPath = buildActionPath(scope2, action);
-  return loadAction(actionPath);
-};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   all,
