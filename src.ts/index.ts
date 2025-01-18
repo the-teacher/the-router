@@ -1,4 +1,4 @@
-import { Router, RequestHandler } from "express";
+import { RequestHandler } from "express";
 
 import {
   getRouter,
