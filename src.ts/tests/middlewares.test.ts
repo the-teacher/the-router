@@ -1,6 +1,7 @@
 import express from "express";
 import request from "supertest";
 import path from "path";
+import { authenticate } from "./test_middlewares/auth";
 
 import {
   root,
@@ -13,7 +14,6 @@ import {
 } from "../index";
 
 import { addDataMiddleware, authMiddleware } from "./middlewares";
-import { loadAction, buildActionPath } from "../utils";
 
 describe("Routes with Middlewares", () => {
   beforeEach(() => {
@@ -110,5 +110,19 @@ describe("Middleware Tests", () => {
   test("middleware example", () => {
     const testMiddleware = (_req: any, _res: any, next: any) => next();
     get("/path", [testMiddleware], "some/action");
+  });
+});
+
+describe("Middleware", () => {
+  beforeEach(() => {
+    resetRouter();
+    setActionsPath(path.join(__dirname, "./test_actions"));
+  });
+
+  test("should apply middleware to route", () => {
+    get("/users", [authenticate], "users/show");
+    const router = getRouter();
+    expect(router.stack?.length).toBe(1);
+    expect(router.stack?.[0]?.route?.stack?.length).toBe(2); // middleware + action
   });
 });

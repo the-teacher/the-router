@@ -10,7 +10,7 @@ import {
   setRouterOptions,
 } from "./base";
 
-import { loadAction, buildActionPath } from "./utils";
+import { loadAction } from "./utils";
 
 export const root = (
   middlewares: RequestHandler[] | string,
@@ -232,5 +232,5 @@ export {
 };
 
 const loadActionHandler = (actionPath: string) => {
-  return loadAction(buildActionPath(actionPath));
+  return loadAction(actionPath);
 };

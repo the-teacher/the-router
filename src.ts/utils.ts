@@ -10,25 +10,20 @@ export const normalizeActionPath = (actionPath: string) => {
   return actionPath;
 };
 
-export const buildActionPath = (actionPath: string) => {
-  const actionsPath = getActionsPath();
-  const normalizedPath = normalizeActionPath(actionPath);
-  const actionFile = `${normalizedPath}Action`;
-
-  if (!isCustomActionsPath()) {
-    return path.join(process.cwd(), actionsPath, actionFile);
-  }
-
-  return path.join(actionsPath, actionFile);
-};
-
 export const loadAction = (actionPath: string) => {
   try {
-    const actionModule = require(actionPath);
+    const actionsPath = getActionsPath();
+    const normalizedPath = normalizeActionPath(actionPath);
+    const actionFile = `${normalizedPath}Action`;
+    const fullPath = !isCustomActionsPath()
+      ? path.join(process.cwd(), actionsPath, actionFile)
+      : path.join(actionsPath, actionFile);
+
+    const actionModule = require(fullPath);
 
     if (typeof actionModule.perform !== "function") {
       throw new Error(
-        `Action module at ${actionPath} must export a 'perform' function`
+        `Action module at ${fullPath} must export a 'perform' function`
       );
     }
 

@@ -1,6 +1,6 @@
 import path from "path";
 import { getRouter } from "../base";
-import { normalizeActionPath, buildActionPath, loadAction } from "../utils";
+import { normalizeActionPath, loadAction } from "../utils";
 import { getActionsPath, setActionsPath, resetRouter } from "../base";
 
 describe("Utils", () => {
@@ -22,24 +22,15 @@ describe("Utils", () => {
     });
   });
 
-  describe("buildActionPath", () => {
-    test("should build correct path without scope", () => {
-      const result = buildActionPath("users/show");
-      expect(result).toContain("/test_actions/users/showAction");
-    });
-  });
-
   describe("loadAction", () => {
     test("should load existing action", () => {
-      const actionPath = buildActionPath("test/get");
-      const handler = loadAction(actionPath);
+      const handler = loadAction("test/get");
       expect(typeof handler).toBe("function");
       expect(console.error).not.toHaveBeenCalled();
     });
 
     test("should return fallback handler for non-existent action", async () => {
-      const actionPath = buildActionPath("test/nonExistent");
-      const handler = loadAction(actionPath);
+      const handler = loadAction("test/nonExistent");
 
       const req = {};
       const res = {
