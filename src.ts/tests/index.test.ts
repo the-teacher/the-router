@@ -634,11 +634,23 @@ describe("Routes", () => {
       resources("posts");
       const app = express();
       app.use(getRouter());
+      // Add 404 handler
+      app.use((_req, res) => {
+        res.status(404).json({
+          error: "Not Found",
+          message: res.statusMessage || "Not Found",
+        });
+      });
 
       // With strict routing, trailing slashes matter
       const response1 = await request(app).get("/posts").expect(200);
       const response2 = await request(app).get("/posts/").expect(404);
+
       expect(response1.body).toEqual({ action: "index" });
+      expect(response2.body).toEqual({
+        error: "Not Found",
+        message: "Not Found",
+      });
     });
 
     test("should respect case sensitive routing option", async () => {
@@ -647,11 +659,23 @@ describe("Routes", () => {
       resources("posts");
       const app = express();
       app.use(getRouter());
+      // Add 404 handler
+      app.use((_req, res) => {
+        res.status(404).json({
+          error: "Not Found",
+          message: res.statusMessage || "Not Found",
+        });
+      });
 
       // With case sensitive routing, case matters
       const response1 = await request(app).get("/posts").expect(200);
       const response2 = await request(app).get("/POSTS").expect(404);
+
       expect(response1.body).toEqual({ action: "index" });
+      expect(response2.body).toEqual({
+        error: "Not Found",
+        message: "Not Found",
+      });
     });
 
     test("should apply options to scoped routes", async () => {
