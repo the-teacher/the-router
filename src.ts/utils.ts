@@ -81,7 +81,5 @@ export const loadAction = (actionPath: string) => {
         details: error.message,
       });
     };
-
-    throw error;
   }
 };
