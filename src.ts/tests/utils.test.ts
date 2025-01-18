@@ -27,7 +27,7 @@ describe("Utils", () => {
       expect(console.error).not.toHaveBeenCalled();
     });
 
-    test("should return fallback handler for non-existent action", async () => {
+    test("should return error handler for non-existent action", async () => {
       const handler = loadAction("test/nonExistent");
       const req = {};
       const res = {
@@ -37,23 +37,30 @@ describe("Utils", () => {
 
       await handler(req, res);
 
-      expect(console.error).toHaveBeenCalledTimes(2);
-      expect(console.error).toHaveBeenNthCalledWith(
-        1,
-        expect.stringContaining("Action file not found:")
-      );
       expect(res.status).toHaveBeenCalledWith(501);
       expect(res.json).toHaveBeenCalledWith({
-        error: "Not Implemented",
-        message: expect.stringContaining("test/nonExistent"),
-        details: "The requested action has not been implemented yet",
+        error: "Action loading failed",
+        message: "Failed to load the specified action",
+        details: expect.stringContaining("Action file"),
       });
     });
 
-    test("should throw error when action module doesn't export perform function", () => {
-      expect(() => {
-        loadAction("test/invalid/noPerform");
-      }).toThrow("must export a 'perform' function");
+    test("should return error handler when action module doesn't export perform function", async () => {
+      const handler = loadAction("test/invalid/noPerform");
+      const req = {};
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
+      await handler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(501);
+      expect(res.json).toHaveBeenCalledWith({
+        error: "Action loading failed",
+        message: "Failed to load the specified action",
+        details: expect.stringContaining("must export a 'perform' function"),
+      });
     });
 
     test("should handle custom actions path", () => {
@@ -70,8 +77,8 @@ describe("Utils", () => {
       expect(typeof handler).toBe("function");
     });
 
-    test("should extract correct action name from path", async () => {
-      const handler = loadAction("admin/users/list");
+    test("should return error handler for empty action path", async () => {
+      const handler = loadAction("");
       const req = {};
       const res = {
         status: jest.fn().mockReturnThis(),
@@ -80,24 +87,30 @@ describe("Utils", () => {
 
       await handler(req, res);
 
+      expect(res.status).toHaveBeenCalledWith(501);
       expect(res.json).toHaveBeenCalledWith({
-        error: "Not Implemented",
-        message: expect.stringContaining("admin/users/list"),
-        details: expect.any(String),
+        error: "Action loading failed",
+        message: "Failed to load the specified action",
+        details: "Action path cannot be empty",
       });
     });
 
-    test("should handle empty action path", () => {
-      expect(() => {
-        loadAction("");
-      }).toThrow("Action path cannot be empty");
-    });
+    test("should return error handler for undefined action path", async () => {
+      const handler = loadAction(undefined as any);
+      const req = {};
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
 
-    test("should handle undefined action path", () => {
-      expect(() => {
-        // @ts-ignore: testing runtime behavior
-        loadAction(undefined);
-      }).toThrow("Action path cannot be empty");
+      await handler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(501);
+      expect(res.json).toHaveBeenCalledWith({
+        error: "Action loading failed",
+        message: "Failed to load the specified action",
+        details: "Action path cannot be empty",
+      });
     });
   });
 

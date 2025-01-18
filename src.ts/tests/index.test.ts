@@ -688,8 +688,8 @@ describe("Routes", () => {
       const response = await request(app).get("/");
       expect(response.status).toBe(501);
       expect(response.body).toEqual({
-        error: "Not Implemented",
-        message: expect.stringContaining("non_existent/index"),
+        error: "Action loading failed",
+        message: "Failed to load the specified action",
         details: expect.any(String),
       });
     });
@@ -705,8 +705,8 @@ describe("Routes", () => {
       const response = await request(app).get("/admin/users");
       expect(response.status).toBe(501);
       expect(response.body).toEqual({
-        error: "Not Implemented",
-        message: expect.stringContaining("admin/missing/list"),
+        error: "Action loading failed",
+        message: "Failed to load the specified action",
         details: expect.any(String),
       });
     });
