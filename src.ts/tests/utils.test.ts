@@ -74,6 +74,7 @@ describe("Utils", () => {
       const actionPath = buildActionPath(scopeName, action);
       const handler = loadAction(actionPath);
       expect(typeof handler).toBe("function");
+      expect(console.error).not.toHaveBeenCalled();
     });
 
     test("should return fallback handler for non-existent action", async () => {
@@ -92,6 +93,17 @@ describe("Utils", () => {
 
       // Call the handler
       await handler(req, res);
+
+      // Verify console.error was called with correct messages
+      expect(console.error).toHaveBeenCalledTimes(2);
+      expect(console.error).toHaveBeenNthCalledWith(
+        1,
+        expect.stringContaining("Action file not found:")
+      );
+      expect(console.error).toHaveBeenNthCalledWith(
+        2,
+        expect.stringContaining("Please create action file")
+      );
 
       // Verify that response was sent with 501 status code
       expect(res.status).toHaveBeenCalledWith(501);
