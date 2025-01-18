@@ -68,6 +68,7 @@ export const loadActionImplementation = (actionPath: string) => {
   const validActionPath = validateActionFile(fullActionPath, VALID_EXTENSIONS);
 
   // Require the module and validate its structure
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const actionModule = require(validActionPath);
   validateActionModule(actionModule, validActionPath);
 
