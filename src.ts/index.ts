@@ -29,7 +29,7 @@ export const root = (
     finalActionPath = middlewares;
   }
 
-  handlers.push(loadActionHandler(finalActionPath));
+  handlers.push(loadAction(finalActionPath));
 
   getRouter().get("/", ...handlers);
 };
@@ -56,7 +56,7 @@ const createRouteHandler =
       finalActionPath = middlewares;
     }
 
-    handlers.push(loadActionHandler(finalActionPath));
+    handlers.push(loadAction(finalActionPath));
 
     const router = getRouter();
     const path =
@@ -215,7 +215,7 @@ const createHandlers = (
 ): RequestHandler[] => {
   const handlers = [...getScopeMiddlewares(), ...middlewares];
   const fullActionPath = `${resourcePath}/${action}`;
-  handlers.push(loadActionHandler(fullActionPath));
+  handlers.push(loadAction(fullActionPath));
   return handlers;
 };
 
@@ -229,8 +229,4 @@ export {
   resetRouter,
   routeScope,
   setRouterOptions,
-};
-
-const loadActionHandler = (actionPath: string) => {
-  return loadAction(actionPath);
 };
