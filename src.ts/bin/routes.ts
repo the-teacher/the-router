@@ -1,6 +1,6 @@
 import { root, get, post } from "../index";
 
-// Определяем простые маршруты
+// Define basic routes
 root("index/index");
 get("/users", "users/list");
 post("/users", "users/create");

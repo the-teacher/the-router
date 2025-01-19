@@ -4,7 +4,14 @@
 import path from "path";
 import { getRouter, resetRouter } from "../index";
 
-export const parseArgs = (args: string[]) => {
+type RouteLayer = {
+  route?: {
+    path: string;
+    methods: Record<string, boolean>;
+  };
+};
+
+export const parseArgs = (args: string[]): Record<string, string> => {
   const options: Record<string, string> = {};
 
   args.slice(2).forEach((arg) => {
@@ -17,7 +24,7 @@ export const parseArgs = (args: string[]) => {
   return options;
 };
 
-export const sync = async (options: Record<string, string>) => {
+export const sync = async (options: Record<string, string>): Promise<void> => {
   try {
     if (!options.routesFile) {
       throw new Error("routesFile parameter is required");
@@ -33,7 +40,7 @@ export const sync = async (options: Record<string, string>) => {
     const router = getRouter();
 
     console.log("\nConfigured Routes:");
-    router.stack.forEach((layer) => {
+    (router.stack as RouteLayer[]).forEach((layer) => {
       if (layer.route) {
         const methods = Object.keys(layer.route.methods)
           .join(", ")
@@ -47,7 +54,7 @@ export const sync = async (options: Record<string, string>) => {
   }
 };
 
-// Проверяем, запущен ли файл напрямую
+// Check if file is run directly
 const isMainModule = import.meta.url.startsWith("file:");
 
 if (isMainModule) {

@@ -9,18 +9,18 @@ let actionsPath: string = DEFAULT_ACTIONS_PATH;
 let isCustomPath: boolean = false;
 let routerOptions: RouterOptions = {};
 
-export const setRouterOptions = (options: RouterOptions) => {
+const setRouterOptions = (options: RouterOptions): void => {
   routerOptions = options;
 };
 
-export const getRouter = () => {
+const getRouter = (): Router => {
   if (!router) {
     router = Router(routerOptions);
   }
   return router;
 };
 
-export const resetRouter = () => {
+const resetRouter = (): void => {
   router = null;
   currentScope = null;
   scopeMiddlewares = [];
@@ -28,32 +28,33 @@ export const resetRouter = () => {
   actionsPath = DEFAULT_ACTIONS_PATH;
   routerOptions = {};
 };
-export const setActionsPath = (path: string) => {
+
+const setActionsPath = (path: string): string => {
   isCustomPath = true;
   actionsPath = path;
   return path;
 };
 
-export const isCustomActionsPath = () => isCustomPath;
-export const getActionsPath = () => actionsPath;
+const isCustomActionsPath = (): boolean => isCustomPath;
+const getActionsPath = (): string => actionsPath;
 
-export const setRouterScope = (scope: string | null) => {
+const setRouterScope = (scope: string | null): void => {
   currentScope = scope;
 };
 
-export const getRouterScope = () => currentScope;
+const getRouterScope = (): string | null => currentScope;
 
-export const getScopeMiddlewares = () => scopeMiddlewares;
+const getScopeMiddlewares = (): RequestHandler[] => scopeMiddlewares;
 
-export const setScopeMiddlewares = (middlewares: RequestHandler[]) => {
+const setScopeMiddlewares = (middlewares: RequestHandler[]): void => {
   scopeMiddlewares = middlewares;
 };
 
-export const routeScope = (
+const routeScope = (
   scope: string,
   middlewaresOrCallback: RequestHandler[] | (() => void),
   routesDefinitionCallback?: () => void
-) => {
+): void => {
   const scopedRouter = Router(routerOptions);
   const originalRouter = router;
   const originalScopeMiddlewares = scopeMiddlewares;
@@ -81,4 +82,19 @@ export const routeScope = (
 
   // Mount scoped router to the main router with scope prefix
   getRouter().use(`/${scope}`, scopedRouter);
+};
+
+// Export all functions at the end since there are more than 5 exports
+export {
+  setRouterOptions,
+  getRouter,
+  resetRouter,
+  setActionsPath,
+  isCustomActionsPath,
+  getActionsPath,
+  setRouterScope,
+  getRouterScope,
+  getScopeMiddlewares,
+  setScopeMiddlewares,
+  routeScope,
 };
