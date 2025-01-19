@@ -105,26 +105,26 @@ const addRouteToMap = (
   middlewares: RequestHandler[] = []
 ): void => {
   // Convert RegExp to string if needed
-  const pathString = path instanceof RegExp ? path.toString() : path;
+  let pathString = path instanceof RegExp ? path.toString() : path;
 
-  // Normalize the path to ensure it starts with / (only for string paths)
-  const normalizedPath =
-    typeof path === "string"
-      ? path.startsWith("/")
-        ? path
-        : `/${path}`
-      : pathString;
-
-  // If we're in a scope, prefix the path with the scope (only for string paths)
-  const scopedPath =
-    typeof path === "string" && currentScope
+  // If we're in a scope and dealing with a RegExp, modify the RegExp pattern
+  if (currentScope && path instanceof RegExp) {
+    // Remove leading/trailing slashes from the RegExp string
+    const regexStr = path.toString().replace(/^\/|\/$/g, "");
+    // Create new RegExp with scope prefix
+    pathString = `/${currentScope}/${regexStr}/`;
+  } else if (typeof path === "string") {
+    // Handle string paths as before
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    pathString = currentScope
       ? `/${currentScope}${normalizedPath}`
       : normalizedPath;
+  }
 
-  const routeKey = `${method.toUpperCase()}:${scopedPath}`;
+  const routeKey = `${method.toUpperCase()}:${pathString}`;
   routesMap.set(routeKey, {
     method: method.toUpperCase(),
-    path: scopedPath,
+    path: pathString,
     action,
     middlewares,
   });

@@ -141,30 +141,37 @@ describe("the-router", () => {
     );
   });
 
-  it.skip("should handle routes with regular expressions", async () => {
+  it("should handle routes with regular expressions", async () => {
     const regExpRoutesContent = `
-      import { get } from "../index";
-      
-      // RegExp routes
-      get(/^\/api\/v\\d+\/users$/, "api/users/list");
-      get(/.*\\.json$/, "api/json-handler");
-      get(/^\\/downloads\\/.*$/, "files/download");
-    `;
+    import { get } from "../index";
+    
+    // RegExp routes
+    get(/^\\/api\\/v\\d+\\/users$/, "api/users/list");
+    get(/.*\\.json$/, "api/json-handler");
+    get(/^\\/downloads\\/.*$/, "files/download");
+  `;
+
     await createTempRoutesFile(regExpRoutesContent);
+    console.log(tempRoutesFile);
 
     await sync({ routesFile: tempRoutesFile });
 
+    expect(console.log).toHaveBeenCalledWith(
+      "Loading routes from:",
+      expect.any(String)
+    );
+
     expect(console.log).toHaveBeenCalledWith("\nConfigured Routes:");
 
-    expect(console.log).toHaveBeenCalledWith(
-      "GET | /^/api/v\\d+/users$/ | api/users/list"
-    );
-    expect(console.log).toHaveBeenCalledWith(
-      "GET | /.*\\.json$/ | api/json-handler"
-    );
-    expect(console.log).toHaveBeenCalledWith(
-      "GET | /^/downloads/.*$/ | files/download"
-    );
+    const expectedRoutes = [
+      "GET | /^\\/api\\/v\\d+\\/users$/ | api/users/list",
+      "GET | /.*\\.json$/ | api/json-handler",
+      "GET | /^\\/downloads\\/.*$/ | files/download",
+    ];
+
+    expectedRoutes.forEach((route) => {
+      expect(console.log).toHaveBeenCalledWith(route);
+    });
   });
 
   it("should handle complex routing configuration with scopes and RegExp", async () => {
@@ -200,16 +207,14 @@ describe("the-router", () => {
 
     const expectedRoutes = [
       "GET | / | home/index",
-      "GET | /^v\\d+\\/users$/ | api/users/list",
+      "GET | /api/^v\\d+\\/users$/ | api/users/list",
 
       "GET | /api/v1/products | api/v1/products/list",
       "POST | /api/v1/orders | api/v1/orders/create",
 
       "GET | /api/v2/products | api/v2/products/list",
-      "GET | /special-\\w+/ | api/v2/special-handler",
+      "GET | /api/v2/special-\\w+/ | api/v2/special-handler",
     ];
-
-    // "GET | /api/v2/special-\\w+/ | api/v2/special-handler",
 
     expectedRoutes.forEach((route) => {
       expect(console.log).toHaveBeenCalledWith(route);
