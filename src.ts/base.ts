@@ -68,13 +68,15 @@ const routeScope = (
 ): void => {
   const scopedRouter = Router(routerOptions);
   const originalRouter = router;
+  const originalScope = currentScope;
   const originalScopeMiddlewares = scopeMiddlewares;
 
   // Temporarily replace global router with a new one
   router = scopedRouter;
 
   // Set current scope and its middlewares
-  setRouterScope(scope);
+  const newScope = originalScope ? `${originalScope}/${scope}` : scope;
+  setRouterScope(newScope);
 
   if (Array.isArray(middlewaresOrCallback)) {
     setScopeMiddlewares(middlewaresOrCallback);
@@ -88,11 +90,12 @@ const routeScope = (
 
   // Restore original router, scope and middlewares
   router = originalRouter;
-  setRouterScope(null);
+  setRouterScope(originalScope);
   setScopeMiddlewares(originalScopeMiddlewares);
 
   // Mount scoped router to the main router with scope prefix
-  getRouter().use(`/${scope}`, scopedRouter);
+  const mountPath = `/${scope}`;
+  getRouter().use(mountPath, scopedRouter);
 };
 
 const addRouteToMap = (
@@ -101,10 +104,18 @@ const addRouteToMap = (
   action: string,
   middlewares: RequestHandler[] = []
 ): void => {
-  const routeKey = `${method.toUpperCase()}:${path}`;
+  // Normalize the path to ensure it starts with /
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  // If we're in a scope, prefix the path with the scope
+  const scopedPath = currentScope
+    ? `/${currentScope}${normalizedPath}`
+    : normalizedPath;
+
+  const routeKey = `${method.toUpperCase()}:${scopedPath}`;
   routesMap.set(routeKey, {
     method: method.toUpperCase(),
-    path,
+    path: scopedPath,
     action,
     middlewares,
   });
