@@ -112,26 +112,26 @@ import { authenticate } from "./middlewares/auth";
 import { validateUser } from "./middlewares/validation";
 
 // Single middleware
-get("/users/:id", [authenticate], "users#show");
+get("/users/:id", [authenticate], "users/show");
 
 // Multiple middleware in execution order
-post("/users", [authenticate, validateUser], "users#create");
+post("/users", [authenticate, validateUser], "users/create");
 
 // Root route with middleware
-root([authenticate], "index#index");
+root([authenticate], "index/index");
 
 // Simple routes without middleware
-get("/about", "pages#about");
-post("/contact", "pages#contact");
+get("/about", "pages/about");
+post("/contact", "pages/contact");
 
 // Middleware with scoped routes
 scope("admin", [authenticate], () => {
   // These routes inherit authentication from scope
-  get("/users", "users#show");
-  post("/users", "users#create");
+  get("/users", "users/show");
+  post("/users", "users/create");
 
   // Additional middleware for specific routes
-  post("/users/:id", [validateUser], "users#update");
+  post("/users/:id", [validateUser], "users/update");
 });
 ```
 
@@ -147,23 +147,23 @@ import { logRequest } from "./middlewares/logging";
 // Apply middleware to all routes within scope
 scope("admin", [authenticate], () => {
   // These routes will require authentication
-  get("/users", "users#index");
-  post("/users", "users#create");
+  get("/users", "users/index");
+  post("/users", "users/create");
 
   // This route will require both authentication and validation
-  post("/users/:id", [validateUser], "users#update");
+  post("/users/:id", [validateUser], "users/update");
 });
 
 // Combine multiple middleware for scope
 scope("api", [authenticate, logRequest], () => {
-  get("/stats", "stats#index");
-  get("/health", "health#check");
+  get("/stats", "stats/index");
+  get("/health", "health/check");
 });
 
 // Simple scope without middleware
 scope("public", () => {
-  get("/about", "pages#about");
-  get("/contact", "pages#contact");
+  get("/about", "pages/about");
+  get("/contact", "pages/contact");
 });
 ```
 
@@ -211,10 +211,10 @@ post("/posts", "posts/create"); // -> src/actions/posts/createAction.ts
 
 // Admin scope
 scope("admin", () => {
-  get("/users", "users#list"); // -> src/actions/admin/users/listAction.ts
+  get("/users", "admin/users/list"); // -> src/actions/admin/users/listAction.ts
   post("/users", "admin/users/create"); // -> src/actions/admin/users/createAction.ts
-  get("/posts", "posts#list"); // -> src/actions/admin/posts/listAction.ts
-  post("/posts", "posts#update"); // -> src/actions/admin/posts/updateAction.ts
+  get("/posts", "admin/posts/list"); // -> src/actions/admin/posts/listAction.ts
+  post("/posts", "admin/posts/update"); // -> src/actions/admin/posts/updateAction.ts
 });
 ```
 
@@ -236,7 +236,7 @@ Group related routes under a common prefix:
 
 ```ts
 scope("admin", () => {
-  get("/users", "users#list"); // -> src/actions/admin/users/listAction.ts
+  get("/users", "admin/users/list"); // -> src/actions/admin/users/listAction.ts
   post("/users", "admin/users/create"); // -> src/actions/admin/users/createAction.ts
 });
 ```
@@ -247,14 +247,14 @@ Routes can include dynamic parameters:
 
 ```ts
 // Basic parameter routes
-get("/users/:id", "users#show"); // -> /users/123
-get("/posts/:id/comments", "posts#comments"); // -> /posts/456/comments
+get("/users/:id", "users/show"); // -> /users/123
+get("/posts/:id/comments", "posts/comments"); // -> /posts/456/comments
 
 // Parameters with middleware
-get("/users/:id", [authenticate], "users#show");
+get("/users/:id", [authenticate], "users/show");
 
 // Multiple parameters
-get("/posts/:postId/comments/:commentId", "comments#show");
+get("/posts/:postId/comments/:commentId", "comments/show");
 ```
 
 ### Route Order
@@ -263,12 +263,12 @@ The order of route definitions matters. More specific routes should be defined b
 
 ```ts
 // ✅ Correct order
-get("/posts/featured", "posts#featured"); // More specific route first
-get("/posts/:id", "posts#show"); // General route second
+get("/posts/featured", "posts/featured"); // More specific route first
+get("/posts/:id", "posts/show"); // General route second
 
 // ❌ Wrong order - "/posts/featured" will never be reached
-get("/posts/:id", "posts#show"); // General route catches all
-get("/posts/featured", "posts#featured"); // Will never match
+get("/posts/:id", "posts/show"); // General route catches all
+get("/posts/featured", "posts/featured"); // Will never match
 ```
 
 ### Middleware Organization
@@ -281,17 +281,17 @@ const authMiddlewares = [authenticate, checkRole];
 const validationMiddlewares = [validateUser, sanitizeInput];
 
 // Use middleware groups in routes
-get("/users", authMiddlewares, "users#index");
-post("/users", [...authMiddlewares, ...validationMiddlewares], "users#create");
+get("/users", authMiddlewares, "users/index");
+post("/users", [...authMiddlewares, ...validationMiddlewares], "users/create");
 
 // In scoped routes
 const adminMiddlewares = [authenticate, requireAdmin, logAccess];
 scope("admin", adminMiddlewares, () => {
-  get("/users", "users#list");
+  get("/users", "users/list");
 
   // Additional middleware for specific routes
   const userUpdateMiddlewares = [validateUser];
-  post("/users/:id", userUpdateMiddlewares, "users#update");
+  post("/users/:id", userUpdateMiddlewares, "users/update");
 });
 ```
 
