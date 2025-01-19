@@ -17,15 +17,8 @@
 /* eslint-disable no-console */
 
 import path from "path";
-import { getRouter, resetRouter } from "../index";
+import { resetRouter } from "../index";
 import { getRoutesMap } from "../base";
-
-type RouteLayer = {
-  route?: {
-    path: string;
-    methods: Record<string, boolean>;
-  };
-};
 
 export const parseArgs = (args: string[]): Record<string, string> => {
   const options: Record<string, string> = {};
