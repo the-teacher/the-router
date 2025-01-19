@@ -55,7 +55,7 @@ const validateActionModule = (
   }
 };
 
-export const loadActionImplementation = (actionPath: string) => {
+export const loadActionImplementation = async (actionPath: string) => {
   const actionsPath = getActionsPath();
 
   // Validate actions path
@@ -67,24 +67,25 @@ export const loadActionImplementation = (actionPath: string) => {
   // Validate the file exists with a valid extension
   const validActionPath = validateActionFile(fullActionPath, VALID_EXTENSIONS);
 
-  // Require the module and validate its structure
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const actionModule = require(validActionPath);
+  // Import the module and validate its structure
+  const actionModule = await import(validActionPath);
   validateActionModule(actionModule, validActionPath);
 
   return actionModule.perform;
 };
 
 export const loadAction = (actionPath: string) => {
-  try {
-    return loadActionImplementation(actionPath);
-  } catch (error: Error | unknown) {
-    return (req: Request, res: Response) => {
+  // Return a RequestHandler function that handles the async operation
+  return async (req: Request, res: Response) => {
+    try {
+      const handler = await loadActionImplementation(actionPath);
+      return handler(req, res);
+    } catch (error: Error | unknown) {
       res.status(501).json({
         error: "Action loading failed",
         message: "Failed to load the specified action",
         details: error instanceof Error ? error.message : "Unknown error",
       });
-    };
-  }
+    }
+  };
 };

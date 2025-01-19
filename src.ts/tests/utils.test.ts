@@ -5,6 +5,35 @@ import { getActionsPath, setActionsPath, resetRouter } from "../base";
 import { Request, Response } from "express";
 
 describe("Utils", () => {
+  // Create a mock Request object
+  const createMockRequest = (): Partial<Request> => ({
+    get: jest.fn(),
+    header: jest.fn(),
+    accepts: jest.fn(),
+    acceptsCharsets: jest.fn(),
+    acceptsEncodings: jest.fn(),
+    acceptsLanguages: jest.fn(),
+    param: jest.fn(),
+    is: jest.fn(),
+  });
+
+  // Create a mock Response object
+  const createMockResponse = (): Partial<Response> => ({
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn(),
+    send: jest.fn(),
+    sendStatus: jest.fn(),
+    links: jest.fn(),
+    jsonp: jest.fn(),
+    sendFile: jest.fn(),
+    download: jest.fn(),
+    redirect: jest.fn(),
+    render: jest.fn(),
+    locals: {},
+    charset: "",
+    headersSent: false,
+  });
+
   beforeEach(() => {
     resetRouter();
     setActionsPath(path.join(__dirname, "./test_actions"));
@@ -30,13 +59,10 @@ describe("Utils", () => {
 
     test("should return error handler for non-existent action", async () => {
       const handler = loadAction("test/nonExistent");
-      const req = {};
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
+      const req = createMockRequest();
+      const res = createMockResponse();
 
-      await handler(req, res);
+      await handler(req as Request, res as unknown as Response);
 
       expect(res.status).toHaveBeenCalledWith(501);
       expect(res.json).toHaveBeenCalledWith({
@@ -48,13 +74,10 @@ describe("Utils", () => {
 
     test("should return error handler when action module doesn't export perform function", async () => {
       const handler = loadAction("test/invalid/noPerform");
-      const req = {};
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
+      const req = createMockRequest();
+      const res = createMockResponse();
 
-      await handler(req, res);
+      await handler(req as Request, res as unknown as Response);
 
       expect(res.status).toHaveBeenCalledWith(501);
       expect(res.json).toHaveBeenCalledWith({
@@ -80,13 +103,10 @@ describe("Utils", () => {
 
     test("should return error handler for empty action path", async () => {
       const handler = loadAction("");
-      const req = {};
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
+      const req = createMockRequest();
+      const res = createMockResponse();
 
-      await handler(req, res);
+      await handler(req as Request, res as unknown as Response);
 
       expect(res.status).toHaveBeenCalledWith(501);
       expect(res.json).toHaveBeenCalledWith({
@@ -98,13 +118,10 @@ describe("Utils", () => {
 
     test("should return error handler for undefined action path", async () => {
       const handler = loadAction(undefined as unknown as string);
-      const req = {} as Request;
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as unknown as Response;
+      const req = createMockRequest();
+      const res = createMockResponse();
 
-      await handler(req, res);
+      await handler(req as Request, res as unknown as Response);
 
       expect(res.status).toHaveBeenCalledWith(501);
       expect(res.json).toHaveBeenCalledWith({
