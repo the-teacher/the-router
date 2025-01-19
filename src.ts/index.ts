@@ -70,11 +70,8 @@ const createRouteHandler =
         ? urlPath
         : `/${urlPath}`;
 
-    // Add route to map (only for string paths)
-    if (typeof urlPath === "string") {
-      const normalizedPath = urlPath.startsWith("/") ? urlPath : `/${urlPath}`;
-      addRouteToMap(method, normalizedPath, finalActionPath, handlers);
-    }
+    // Add all routes to map, including RegExp routes
+    addRouteToMap(method, urlPath, finalActionPath, handlers);
 
     switch (method) {
       case "get":

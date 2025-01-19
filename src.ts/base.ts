@@ -100,17 +100,26 @@ const routeScope = (
 
 const addRouteToMap = (
   method: string,
-  path: string,
+  path: string | RegExp,
   action: string,
   middlewares: RequestHandler[] = []
 ): void => {
-  // Normalize the path to ensure it starts with /
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  // Convert RegExp to string if needed
+  const pathString = path instanceof RegExp ? path.toString() : path;
 
-  // If we're in a scope, prefix the path with the scope
-  const scopedPath = currentScope
-    ? `/${currentScope}${normalizedPath}`
-    : normalizedPath;
+  // Normalize the path to ensure it starts with / (only for string paths)
+  const normalizedPath =
+    typeof path === "string"
+      ? path.startsWith("/")
+        ? path
+        : `/${path}`
+      : pathString;
+
+  // If we're in a scope, prefix the path with the scope (only for string paths)
+  const scopedPath =
+    typeof path === "string" && currentScope
+      ? `/${currentScope}${normalizedPath}`
+      : normalizedPath;
 
   const routeKey = `${method.toUpperCase()}:${scopedPath}`;
   routesMap.set(routeKey, {

@@ -55,16 +55,21 @@ describe("Routes Map", () => {
     expect(postRoute?.action).toBe("admin/users/create");
   });
 
-  test("should not include regexp routes in map", () => {
+  test("should include regexp routes in map as strings", () => {
     get(/.*fly$/, "test/regexp");
     get("/butterfly", "test/butterfly");
 
     const routes = getRoutesMap();
-    expect(routes.size).toBe(1); // Only the string path route should be in the map
+    expect(routes.size).toBe(2); // Now both routes should be in the map
 
-    const route = routes.get("GET:/butterfly");
-    expect(route).toBeDefined();
-    expect(route?.action).toBe("test/butterfly");
+    const regexpRoute = routes.get("GET:/.*fly$/");
+    expect(regexpRoute).toBeDefined();
+    expect(regexpRoute?.action).toBe("test/regexp");
+    expect(regexpRoute?.path).toBe("/.*fly$/");
+
+    const stringRoute = routes.get("GET:/butterfly");
+    expect(stringRoute).toBeDefined();
+    expect(stringRoute?.action).toBe("test/butterfly");
   });
 
   test("should normalize paths in routes map", () => {
