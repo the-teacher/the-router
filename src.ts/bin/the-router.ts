@@ -77,7 +77,7 @@ export const sync = async (options: Record<string, string>): Promise<void> => {
 
     routesMap.forEach((route, key) => {
       const [method, path] = key.split(":");
-      console.warn(`${method} | ${path} | ${route.action}`);
+      // console.warn(`${method} | ${path} | ${route.action}`);
       console.log(`${method} | ${path} | ${route.action}`);
     });
   } catch (error) {
