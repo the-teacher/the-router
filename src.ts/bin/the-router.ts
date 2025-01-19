@@ -26,14 +26,10 @@ export const parseArgs = (args: string[]): Record<string, string> => {
 };
 
 export const sync = async (options: Record<string, string>): Promise<void> => {
-  console.log("options.routesFile", options.routesFile);
-
   if (!options.routesFile) {
     console.error("Error:", "routesFile parameter is required");
     process.exit(1);
   }
-
-  console.log("CONTINUE >>>>>");
 
   try {
     resetRouter();
