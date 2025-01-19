@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2018",
-    "module": "CommonJS",
+    "module": "ESNext",
     "lib": ["ES2018"],
     "strict": true,
     "esModuleInterop": true,
@@ -13,7 +13,8 @@
     "baseUrl": ".",
     "outDir": "src",
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "allowJs": true
   },
   "include": ["src.ts/**/*"],
   "exclude": ["node_modules", "src"]

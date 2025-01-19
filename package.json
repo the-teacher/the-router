@@ -1,18 +1,20 @@
 {
   "name": "@the-teacher/the-router",
   "version": "0.9.1",
+  "type": "module",
   "description": "Simple router for Express.js, making routes and actions easy to manage.",
   "publishConfig": {
     "access": "public"
   },
   "main": "src/index.js",
   "scripts": {
-    "build": "node build.js",
+    "build": "node build.mjs",
     "test": "jest",
     "test:watch": "jest --watch",
-    "dev": "node build.js --watch",
+    "dev": "node build.mjs --watch",
     "lint": "eslint src.ts",
-    "lint:fix": "eslint src.ts --fix"
+    "lint:fix": "eslint src.ts --fix",
+    "sync": "yarn build && node src/bin/the-router.js sync routesFile=./routes.js"
   },
   "repository": {
     "type": "git",
@@ -54,5 +56,8 @@
   },
   "dependencies": {
     "express": "^4.18.3"
+  },
+  "bin": {
+    "the-router": "./src/bin/the-router.js"
   }
 }

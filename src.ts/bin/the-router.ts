@@ -18,22 +18,19 @@ export const parseArgs = (args: string[]) => {
 };
 
 export const sync = async (options: Record<string, string>) => {
-  if (!options.routesFile) {
-    console.error("Error: routesFile parameter is required");
-    process.exit(1);
-  }
-
   try {
+    if (!options.routesFile) {
+      throw new Error("routesFile parameter is required");
+    }
+
     resetRouter();
 
     const routesFilePath = path.resolve(process.cwd(), options.routesFile);
+    console.log("Loading routes from:", routesFilePath);
 
     await import(routesFilePath);
 
     const router = getRouter();
-
-    console.log("\nRouter configuration:");
-    console.log(router);
 
     console.log("\nConfigured Routes:");
     router.stack.forEach((layer) => {
@@ -45,21 +42,30 @@ export const sync = async (options: Record<string, string>) => {
       }
     });
   } catch (error) {
-    console.error("Error loading routes file:", error);
+    console.error("Error:", error instanceof Error ? error.message : error);
     process.exit(1);
   }
 };
 
-const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+// Проверяем, запущен ли файл напрямую
+const isMainModule = import.meta.url.startsWith("file:");
 
 if (isMainModule) {
   const command = process.argv[2];
   const options = parseArgs(process.argv);
 
+  if (!command) {
+    console.error("Error: Command is required. Available commands: sync");
+    process.exit(1);
+  }
+
   if (command === "sync") {
-    sync(options);
+    sync(options).catch((error) => {
+      console.error("Error:", error);
+      process.exit(1);
+    });
   } else {
-    console.log("Unknown command. Available commands: sync");
+    console.error("Unknown command. Available commands: sync");
     process.exit(1);
   }
 }

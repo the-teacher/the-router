@@ -1,4 +1,4 @@
-const esbuild = require("esbuild");
+import esbuild from "esbuild";
 
 // Check if watch flag is present in command line arguments
 const isWatch = process.argv.includes("--watch");
@@ -10,20 +10,18 @@ const config = {
   outdir: "src",
   platform: "node",
   target: "node18",
-  format: "cjs",
+  format: "esm", // Changed from 'cjs' to 'esm'
   sourcemap: true,
   external: ["express"], // Exclude express from bundle
 };
 
 if (isWatch) {
   // Start watch mode for development
-  esbuild.context(config).then((ctx) => {
-    ctx.watch();
-    console.log("Watching for changes...");
-  });
+  const ctx = await esbuild.context(config);
+  await ctx.watch();
+  console.log("Watching for changes...");
 } else {
   // Run single build
-  esbuild.build(config).then(() => {
-    console.log("Build complete");
-  });
+  await esbuild.build(config);
+  console.log("Build complete");
 }

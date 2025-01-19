@@ -1,57 +1,13 @@
-"use strict";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all2) => {
-  for (var name in all2)
-    __defProp(target, name, { get: all2[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src.ts/index.ts
-var src_exports = {};
-__export(src_exports, {
-  all: () => all,
-  destroy: () => destroy,
-  get: () => get,
-  getActionsPath: () => getActionsPath,
-  getRouter: () => getRouter,
-  head: () => head,
-  options: () => options,
-  patch: () => patch,
-  post: () => post,
-  put: () => put,
-  resetRouter: () => resetRouter,
-  resources: () => resources,
-  root: () => root,
-  routeScope: () => routeScope,
-  scope: () => scope,
-  setActionsPath: () => setActionsPath,
-  setRouterOptions: () => setRouterOptions
+var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+}) : x)(function(x) {
+  if (typeof require !== "undefined")
+    return require.apply(this, arguments);
+  throw Error('Dynamic require of "' + x + '" is not supported');
 });
-module.exports = __toCommonJS(src_exports);
 
 // src.ts/base.ts
-var import_express = require("express");
+import { Router } from "express";
 var DEFAULT_ACTIONS_PATH = "src/actions";
 var router = null;
 var currentScope = null;
@@ -64,7 +20,7 @@ var setRouterOptions = (options2) => {
 };
 var getRouter = () => {
   if (!router) {
-    router = (0, import_express.Router)(routerOptions);
+    router = Router(routerOptions);
   }
   return router;
 };
@@ -91,7 +47,7 @@ var setScopeMiddlewares = (middlewares) => {
   scopeMiddlewares = middlewares;
 };
 var routeScope = (scope2, middlewaresOrCallback, routesDefinitionCallback) => {
-  const scopedRouter = (0, import_express.Router)(routerOptions);
+  const scopedRouter = Router(routerOptions);
   const originalRouter = router;
   const originalScopeMiddlewares = scopeMiddlewares;
   router = scopedRouter;
@@ -112,15 +68,15 @@ var routeScope = (scope2, middlewaresOrCallback, routesDefinitionCallback) => {
 };
 
 // src.ts/utils.ts
-var import_fs = __toESM(require("fs"));
-var import_path = __toESM(require("path"));
+import fs from "fs";
+import path from "path";
 var VALID_EXTENSIONS = [".js", ".ts"];
 var getProjectRoot = () => process.cwd();
 var validateActionsPath = (actionsPath2) => {
   if (!actionsPath2) {
     throw new Error("Actions path is not set");
   }
-  if (!import_fs.default.statSync(actionsPath2).isDirectory()) {
+  if (!fs.statSync(actionsPath2).isDirectory()) {
     throw new Error(`Actions path ${actionsPath2} is not a directory`);
   }
 };
@@ -129,12 +85,12 @@ var resolveFullActionPath = (actionsPath2, actionPath) => {
     throw new Error("Action path cannot be empty");
   }
   const actionFile = `${actionPath}Action`;
-  return !isCustomActionsPath() ? import_path.default.join(getProjectRoot(), actionsPath2, actionFile) : import_path.default.join(actionsPath2, actionFile);
+  return !isCustomActionsPath() ? path.join(getProjectRoot(), actionsPath2, actionFile) : path.join(actionsPath2, actionFile);
 };
 var validateActionFile = (fullActionPath, validExtensions) => {
   for (const ext of validExtensions) {
     const candidatePath = `${fullActionPath}${ext}`;
-    if (import_fs.default.existsSync(candidatePath) && import_fs.default.statSync(candidatePath).isFile()) {
+    if (fs.existsSync(candidatePath) && fs.statSync(candidatePath).isFile()) {
       return candidatePath;
     }
   }
@@ -152,7 +108,7 @@ var loadActionImplementation = (actionPath) => {
   validateActionsPath(actionsPath2);
   const fullActionPath = resolveFullActionPath(actionsPath2, actionPath);
   const validActionPath = validateActionFile(fullActionPath, VALID_EXTENSIONS);
-  const actionModule = require(validActionPath);
+  const actionModule = __require(validActionPath);
   validateActionModule(actionModule, validActionPath);
   return actionModule.perform;
 };
@@ -322,8 +278,7 @@ var createHandlers = (middlewares, resourcePath, action) => {
   return handlers;
 };
 var scope = routeScope;
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
+export {
   all,
   destroy,
   get,
@@ -341,5 +296,5 @@ var scope = routeScope;
   scope,
   setActionsPath,
   setRouterOptions
-});
+};
 //# sourceMappingURL=index.js.map
