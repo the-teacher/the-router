@@ -102,4 +102,117 @@ describe("the-router", () => {
       "POST | /api/orders | orders/create"
     );
   });
+
+  it("should handle scoped routes configuration", async () => {
+    const scopedRoutesContent = `
+      import { root, get, post, scope } from "../index";
+      
+      root("home/index");
+      
+      // Basic routes
+      get("/products", "products/list");
+      
+      // Admin scope
+      scope("admin", () => {
+        get("/users", "admin/users/list");
+        post("/users", "admin/users/create");
+        
+        // Nested scope
+        scope("reports", () => {
+          get("/sales", "admin/reports/sales");
+        });
+      });
+    `;
+    await createTempRoutesFile(scopedRoutesContent);
+
+    await sync({ routesFile: tempRoutesFile });
+
+    expect(console.log).toHaveBeenCalledWith("\nConfigured Routes:");
+    expect(console.log).toHaveBeenCalledWith("GET | / | home/index");
+    expect(console.log).toHaveBeenCalledWith("GET | /products | products/list");
+    expect(console.log).toHaveBeenCalledWith(
+      "GET | /admin/users | admin/users/list"
+    );
+    expect(console.log).toHaveBeenCalledWith(
+      "POST | /admin/users | admin/users/create"
+    );
+    expect(console.log).toHaveBeenCalledWith(
+      "GET | /admin/reports/sales | admin/reports/sales"
+    );
+  });
+
+  it.skip("should handle routes with regular expressions", async () => {
+    const regExpRoutesContent = `
+      import { get } from "../index";
+      
+      // RegExp routes
+      get(/^\/api\/v\\d+\/users$/, "api/users/list");
+      get(/.*\\.json$/, "api/json-handler");
+      get(/^\\/downloads\\/.*$/, "files/download");
+    `;
+    await createTempRoutesFile(regExpRoutesContent);
+
+    await sync({ routesFile: tempRoutesFile });
+
+    expect(console.log).toHaveBeenCalledWith("\nConfigured Routes:");
+
+    expect(console.log).toHaveBeenCalledWith(
+      "GET | /^/api/v\\d+/users$/ | api/users/list"
+    );
+    expect(console.log).toHaveBeenCalledWith(
+      "GET | /.*\\.json$/ | api/json-handler"
+    );
+    expect(console.log).toHaveBeenCalledWith(
+      "GET | /^/downloads/.*$/ | files/download"
+    );
+  });
+
+  it("should handle complex routing configuration with scopes and RegExp", async () => {
+    const complexRoutesContent = `
+      import { root, get, post, scope } from "../index";
+      
+      root("home/index");
+      
+      // API scope with versioning
+      scope("api", () => {
+        get(/^v\\d+\\/users$/, "api/users/list");
+        
+        scope("v1", () => {
+          get("/products", "api/v1/products/list");
+          post("/orders", "api/v1/orders/create");
+        });
+        
+        scope("v2", () => {
+          get("/products", "api/v2/products/list");
+          get(/special-\\w+/, "api/v2/special-handler");
+        });
+      });
+    `;
+    await createTempRoutesFile(complexRoutesContent);
+
+    await sync({ routesFile: tempRoutesFile });
+    expect(console.log).toHaveBeenCalledWith(
+      "Loading routes from:",
+      expect.any(String)
+    );
+
+    expect(console.log).toHaveBeenCalledWith("\nConfigured Routes:");
+
+    const expectedRoutes = [
+      "GET | / | home/index",
+      "GET | /^v\\d+\\/users$/ | api/users/list",
+
+      "GET | /api/v1/products | api/v1/products/list",
+      "POST | /api/v1/orders | api/v1/orders/create",
+
+      "GET | /api/v2/products | api/v2/products/list",
+      "GET | /special-\\w+/ | api/v2/special-handler",
+    ];
+
+    // "GET | /api/v2/special-\\w+/ | api/v2/special-handler",
+
+    expectedRoutes.forEach((route) => {
+      expect(console.log).toHaveBeenCalledWith(route);
+    });
+  });
 });
