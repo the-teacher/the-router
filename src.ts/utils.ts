@@ -11,7 +11,7 @@ const validateActionsPath = (actionsPath: string) => {
     throw new Error("Actions path is not set");
   }
 
-  if (!fs.statSync(actionsPath).isDirectory()) {
+  if (!fs.existsSync(actionsPath) || !fs.lstatSync(actionsPath).isDirectory()) {
     throw new Error(`Actions path ${actionsPath} is not a directory`);
   }
 };
@@ -37,7 +37,7 @@ const validateActionFile = (
 ): string => {
   for (const ext of validExtensions) {
     const candidatePath = `${fullActionPath}${ext}`;
-    if (fs.existsSync(candidatePath) && fs.statSync(candidatePath).isFile()) {
+    if (fs.existsSync(candidatePath) && fs.lstatSync(candidatePath).isFile()) {
       return candidatePath; // Return the valid file path
     }
   }
