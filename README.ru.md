@@ -238,7 +238,7 @@ scope("admin", () => {
 ```ts
 // Базовые маршруты с параметрами
 get("/users/:id", "users/show"); // -> /users/123
-get("/posts/:id/comments", "posts#comments"); // -> /posts/456/comments
+get("/posts/:id/comments", "posts/comments"); // -> /posts/456/comments
 
 // Параметры с middleware
 get("/users/:id", [authenticate], "users/show");
@@ -317,24 +317,24 @@ scope("admin", adminMiddlewares, () => {
 
 ```ts
 // Базовое использование
-root("index#index");
-get("/users", "users#show");
-post("/users", "users#create");
-put("/users/:id", "users#update");
-patch("/users/:id", "users#patch");
-destroy("/users/:id", "users#delete");
-options("/users", "users#options");
-head("/users", "users#head");
-all("/api", "api#handle");
+root("index/index");
+get("/users", "users/show");
+post("/users", "users/create");
+put("/users/:id", "users/update");
+patch("/users/:id", "users/patch");
+destroy("/users/:id", "users/delete");
+options("/users", "users/options");
+head("/users", "users/head");
+all("/api", "api/handle");
 scope("admin", () => {
   /* маршруты */
 });
 
 // С middleware
 const authMiddlewares = [authenticate, logRequest];
-root([authenticate], "index#index");
-get("/users", authMiddlewares, "users#show");
-put("/users/:id", authMiddlewares, "users#update");
+root([authenticate], "index/index");
+get("/users", authMiddlewares, "users/show");
+put("/users/:id", authMiddlewares, "users/update");
 scope("admin", authMiddlewares, () => {
   /* маршруты */
 });
@@ -356,7 +356,6 @@ get(/^\/secure\/.*$/, [authenticate], "secure#handle");
 get(/^\/api\/v1\/users$/, "users/list"); // Сначала специфичный маршрут
 get(/^\/api\/v1\/.*$/, "api/handle"); // Затем общий маршрут
 ```
-
 Примечание: При использовании регулярных выражений путь передается в `Express.js` как есть, без какой-либо нормализации.
 
 ### Ресурсные маршруты
@@ -403,3 +402,4 @@ MIT.
 ### Author
 
 Ilya N. Zykin | [the-teacher](https://github.com/the-teacher)
+
