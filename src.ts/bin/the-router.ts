@@ -17,7 +17,8 @@ export const parseArgs = (args: string[]): Record<string, string> => {
   args.slice(2).forEach((arg) => {
     if (arg.includes("=")) {
       const [key, value] = arg.split("=");
-      options[key] = value;
+      const cleanKey = key.replace(/^--/, "");
+      options[cleanKey] = value;
     }
   });
 
@@ -25,11 +26,16 @@ export const parseArgs = (args: string[]): Record<string, string> => {
 };
 
 export const sync = async (options: Record<string, string>): Promise<void> => {
-  try {
-    if (!options.routesFile) {
-      throw new Error("routesFile parameter is required");
-    }
+  console.log("options.routesFile", options.routesFile);
 
+  if (!options.routesFile) {
+    console.error("Error:", "routesFile parameter is required");
+    process.exit(1);
+  }
+
+  console.log("CONTINUE >>>>>");
+
+  try {
     resetRouter();
 
     const routesFilePath = path.resolve(process.cwd(), options.routesFile);
@@ -54,10 +60,7 @@ export const sync = async (options: Record<string, string>): Promise<void> => {
   }
 };
 
-// Check if file is run directly
-const isMainModule = import.meta.url.startsWith("file:");
-
-if (isMainModule) {
+export const runCli = () => {
   const command = process.argv[2];
   const options = parseArgs(process.argv);
 
@@ -75,4 +78,9 @@ if (isMainModule) {
     console.error("Unknown command. Available commands: sync");
     process.exit(1);
   }
+};
+
+// Run CLI only if this file is executed directly
+if (process.argv[1].endsWith("the-router.js")) {
+  runCli();
 }
