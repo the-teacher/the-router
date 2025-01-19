@@ -18,6 +18,7 @@
 
 import path from "path";
 import { getRouter, resetRouter } from "../index";
+import { getRoutesMap } from "../base";
 
 type RouteLayer = {
   route?: {
@@ -54,16 +55,36 @@ export const sync = async (options: Record<string, string>): Promise<void> => {
 
     await import(routesFilePath);
 
-    const router = getRouter();
+    // EXAMPLE OF ROUTES MAP
+    //
+    // Map(3) {
+    //   'GET:/' => {
+    //     method: 'GET',
+    //     path: '/',
+    //     action: 'home/index',
+    //     middlewares: [ [AsyncFunction (anonymous)] ]
+    //   },
+    //   'GET:/api/products' => {
+    //     method: 'GET',
+    //     path: '/api/products',
+    //     action: 'products/list',
+    //     middlewares: [ [AsyncFunction (anonymous)] ]
+    //   },
+    //   'POST:/api/orders' => {
+    //     method: 'POST',
+    //     path: '/api/orders',
+    //     action: 'orders/create',
+    //     middlewares: [ [AsyncFunction (anonymous)] ]
+    //   }
+    // }
+    //
+    const routesMap = getRoutesMap();
 
     console.log("\nConfigured Routes:");
-    (router.stack as RouteLayer[]).forEach((layer) => {
-      if (layer.route) {
-        const methods = Object.keys(layer.route.methods)
-          .join(", ")
-          .toUpperCase();
-        console.log(`${methods} ${layer.route.path}`);
-      }
+
+    routesMap.forEach((route, key) => {
+      const [method, path] = key.split(":");
+      console.log(`${method} | ${path} | ${route.action}`);
     });
   } catch (error) {
     console.error("Error:", error instanceof Error ? error.message : error);

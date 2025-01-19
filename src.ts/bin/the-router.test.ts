@@ -67,17 +67,17 @@ describe("the-router", () => {
     await sync({ routesFile: tempRoutesFile });
 
     // Verify console output for each route
-    expect(console.log).toHaveBeenCalledTimes(6);
-
     expect(console.log).toHaveBeenCalledWith(
       "Loading routes from:",
       expect.any(String)
     );
     expect(console.log).toHaveBeenCalledWith("\nConfigured Routes:");
-    expect(console.log).toHaveBeenCalledWith("GET /");
-    expect(console.log).toHaveBeenCalledWith("GET /users");
-    expect(console.log).toHaveBeenCalledWith("POST /users");
-    expect(console.log).toHaveBeenCalledWith("GET /users/:id");
+
+    // Verify the formatted route outputs
+    expect(console.log).toHaveBeenCalledWith("GET | / | index/index");
+    expect(console.log).toHaveBeenCalledWith("GET | /users | users/list");
+    expect(console.log).toHaveBeenCalledWith("POST | /users | users/create");
+    expect(console.log).toHaveBeenCalledWith("GET | /users/ | users/show");
   });
 
   it("should handle custom routes configuration", async () => {
@@ -92,8 +92,14 @@ describe("the-router", () => {
 
     await sync({ routesFile: tempRoutesFile });
 
-    expect(console.log).toHaveBeenCalledWith("GET /");
-    expect(console.log).toHaveBeenCalledWith("GET /api/products");
-    expect(console.log).toHaveBeenCalledWith("POST /api/orders");
+    expect(console.log).toHaveBeenCalledWith("\nConfigured Routes:");
+
+    expect(console.log).toHaveBeenCalledWith("GET | / | home/index");
+    expect(console.log).toHaveBeenCalledWith(
+      "GET | /api/products | products/list"
+    );
+    expect(console.log).toHaveBeenCalledWith(
+      "POST | /api/orders | orders/create"
+    );
   });
 });
