@@ -9,6 +9,7 @@ import {
   setActionsPath,
   resetRouter,
 } from "../index";
+import { getRoutesMap } from "../base";
 
 describe("Basic routes", () => {
   beforeEach(() => {
@@ -44,5 +45,23 @@ describe("Basic routes", () => {
 
     const response = await request(app).post("/post");
     expect(response.text).toBe("Hello Post!");
+  });
+
+  test("should maintain routes map", async () => {
+    const routes = getRoutesMap();
+
+    expect(routes.size).toBe(3); // root, get, and post routes
+
+    const rootRoute = routes.get("GET:/");
+    expect(rootRoute).toBeDefined();
+    expect(rootRoute?.action).toBe("index/index");
+
+    const getRoute = routes.get("GET:/get");
+    expect(getRoute).toBeDefined();
+    expect(getRoute?.action).toBe("test/get");
+
+    const postRoute = routes.get("POST:/post");
+    expect(postRoute).toBeDefined();
+    expect(postRoute?.action).toBe("test/post");
   });
 });

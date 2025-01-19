@@ -8,6 +8,7 @@ import {
   routeScope,
   getScopeMiddlewares,
   setRouterOptions,
+  addRouteToMap,
 } from "./base";
 
 import { loadAction } from "./utils";
@@ -30,6 +31,9 @@ export const root = (
   }
 
   handlers.push(loadAction(finalActionPath));
+
+  // Add route to map
+  addRouteToMap("GET", "/", finalActionPath, handlers);
 
   getRouter().get("/", ...handlers);
 };
@@ -65,6 +69,12 @@ const createRouteHandler =
         : urlPath.startsWith("/")
         ? urlPath
         : `/${urlPath}`;
+
+    // Add route to map (only for string paths)
+    if (typeof urlPath === "string") {
+      const normalizedPath = urlPath.startsWith("/") ? urlPath : `/${urlPath}`;
+      addRouteToMap(method, normalizedPath, finalActionPath, handlers);
+    }
 
     switch (method) {
       case "get":

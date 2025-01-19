@@ -9,6 +9,16 @@ let actionsPath: string = DEFAULT_ACTIONS_PATH;
 let isCustomPath: boolean = false;
 let routerOptions: RouterOptions = {};
 
+type RouteInfo = {
+  method: string;
+  path: string;
+  action: string;
+  middlewares: RequestHandler[];
+};
+
+// Add routes map
+let routesMap: Map<string, RouteInfo> = new Map();
+
 const setRouterOptions = (options: RouterOptions): void => {
   routerOptions = options;
 };
@@ -27,6 +37,7 @@ const resetRouter = (): void => {
   isCustomPath = false;
   actionsPath = DEFAULT_ACTIONS_PATH;
   routerOptions = {};
+  routesMap = new Map(); // Reset routes map
 };
 
 const setActionsPath = (path: string): string => {
@@ -84,6 +95,23 @@ const routeScope = (
   getRouter().use(`/${scope}`, scopedRouter);
 };
 
+const addRouteToMap = (
+  method: string,
+  path: string,
+  action: string,
+  middlewares: RequestHandler[] = []
+): void => {
+  const routeKey = `${method.toUpperCase()}:${path}`;
+  routesMap.set(routeKey, {
+    method: method.toUpperCase(),
+    path,
+    action,
+    middlewares,
+  });
+};
+
+const getRoutesMap = (): Map<string, RouteInfo> => routesMap;
+
 // Export all functions at the end since there are more than 5 exports
 export {
   setRouterOptions,
@@ -97,4 +125,7 @@ export {
   getScopeMiddlewares,
   setScopeMiddlewares,
   routeScope,
+  addRouteToMap,
+  getRoutesMap,
+  type RouteInfo,
 };
