@@ -10,12 +10,6 @@
 - Группировка маршрутов для улучшенной организации
 - Автоматическая загрузка действий
 
-## Документация
-
-- Development: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)
-- Разработка (RU): [docs/DEVELOPMENT.ru.md](docs/DEVELOPMENT.ru.md)
-- Скелет приложения: [docs/demo/README.md](docs/demo/README.md)
-
 ## Установка
 
 ```bash

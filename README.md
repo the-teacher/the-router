@@ -10,12 +10,6 @@ A simple yet powerful routing solution for `Express.js` applications that provid
 - Scoped routes for better organization
 - Automatic action loading
 
-## Documentation
-
-- Development: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)
-- Development (RU): [docs/DEVELOPMENT.ru.md](docs/DEVELOPMENT.ru.md)
-- Demo app Skeleton: [docs/demo/README.md](docs/demo/README.md)
-
 ## Installation
 
 ```bash
