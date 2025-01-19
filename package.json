@@ -7,8 +7,11 @@
     "access": "public"
   },
   "main": "src/index.js",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "build": "node build.mjs",
+    "build": "rm -rf src/* && touch src/.keep && node build.mjs",
     "test": "jest",
     "test:watch": "jest --watch",
     "dev": "node build.mjs --watch",
