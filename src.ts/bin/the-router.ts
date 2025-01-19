@@ -1,4 +1,19 @@
 #!/usr/bin/env node
+/**
+ * CLI tool for managing and displaying Express routes
+ *
+ * Features:
+ * - Loads routes from a specified file
+ * - Displays configured routes with their HTTP methods and paths
+ * - Supports dynamic route parameters
+ *
+ * Usage:
+ *   node the-router.js sync --routesFile=path/to/routes.ts
+ *
+ * Options:
+ *   --routesFile  Path to the routes configuration file (required)
+ */
+
 /* eslint-disable no-console */
 
 import path from "path";
