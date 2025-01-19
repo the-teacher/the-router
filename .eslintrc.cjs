@@ -19,7 +19,7 @@ module.exports = {
     "no-console": ["warn", { allow: ["warn", "error"] }],
   },
   parserOptions: {
-    ecmaVersion: 2020,
+    ecmaVersion: 2022,
     sourceType: "module",
   },
   ignorePatterns: ["dist/", "node_modules/", "*.js"],
