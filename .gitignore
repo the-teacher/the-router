@@ -16,3 +16,4 @@ lerna-debug.log*
 .yarn/install-state.gz
 .pnp.*
 /src
+/coverage

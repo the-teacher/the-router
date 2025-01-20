@@ -17,6 +17,7 @@
     "dev": "node build.mjs --watch",
     "lint": "eslint src.ts",
     "lint:fix": "eslint src.ts --fix",
+    "coverage": "jest --coverage",
     "sync": "yarn build && node --trace-deprecation --trace-warnings --loader ts-node/esm src/bin/the-router.js sync --routesFile=src.ts/bin/routes.ts"
   },
   "repository": {
