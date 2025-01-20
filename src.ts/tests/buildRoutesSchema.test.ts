@@ -94,21 +94,23 @@ describe("buildRoutesSchema", () => {
     );
 
     // API routes
-    expect(content).toContain("| GET | /api/status | api/status | none |");
     expect(content).toContain(
-      "| GET | /api/v1/users | api/v1/users/list | none |"
+      "| GET | /api/status | api/status | 1 middleware(s) |"
     );
     expect(content).toContain(
-      "| POST | /api/v1/users | api/v1/users/create | none |"
+      "| GET | /api/v1/users | api/v1/users/list | 1 middleware(s) |"
     );
     expect(content).toContain(
-      "| GET | /api/v1/admin/dashboard | api/v1/admin/dashboard | none |"
+      "| POST | /api/v1/users | api/v1/users/create | 1 middleware(s) |"
     );
     expect(content).toContain(
-      "| POST | /api/v1/admin/settings | api/v1/admin/settings | none |"
+      "| GET | /api/v1/admin/dashboard | api/v1/admin/dashboard | 3 middleware(s) |"
     );
     expect(content).toContain(
-      "| GET | /api/v2/users | api/v2/users/list | none |"
+      "| POST | /api/v1/admin/settings | api/v1/admin/settings | 2 middleware(s) |"
+    );
+    expect(content).toContain(
+      "| GET | /api/v2/users | api/v2/users/list | 1 middleware(s) |"
     );
   });
 });

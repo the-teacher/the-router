@@ -71,20 +71,25 @@ const routeScope = (
   const originalScope = currentScope;
   const originalScopeMiddlewares = scopeMiddlewares;
 
-  // Temporarily replace global router with a new one
+  // Temporarily replace global router with new scoped one
   router = scopedRouter;
 
-  // Set current scope and its middlewares
+  // Set current scope
   const newScope = originalScope ? `${originalScope}/${scope}` : scope;
   setRouterScope(newScope);
 
+  // Accumulate middlewares from parent scope
   if (Array.isArray(middlewaresOrCallback)) {
-    setScopeMiddlewares(middlewaresOrCallback);
+    setScopeMiddlewares([
+      ...originalScopeMiddlewares,
+      ...middlewaresOrCallback
+    ]);
     if (routesDefinitionCallback) {
       routesDefinitionCallback();
     }
   } else {
-    setScopeMiddlewares([]);
+    // Keep parent middlewares when no new ones are added
+    setScopeMiddlewares([...originalScopeMiddlewares]);
     middlewaresOrCallback();
   }
 
@@ -93,9 +98,13 @@ const routeScope = (
   setRouterScope(originalScope);
   setScopeMiddlewares(originalScopeMiddlewares);
 
-  // Mount scoped router to the main router with scope prefix
-  const mountPath = `/${scope}`;
-  getRouter().use(mountPath, scopedRouter);
+  // Apply accumulated middlewares to the scoped router
+  const currentMiddlewares = getScopeMiddlewares();
+  if (currentMiddlewares.length > 0) {
+    getRouter().use(`/${scope}`, currentMiddlewares, scopedRouter);
+  } else {
+    getRouter().use(`/${scope}`, scopedRouter);
+  }
 };
 
 const addRouteToMap = (
