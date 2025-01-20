@@ -166,7 +166,7 @@ describe("the-router", () => {
     const expectedRoutes = [
       "GET | /^\\/api\\/v\\d+\\/users$/ | api/users/list",
       "GET | /.*\\.json$/ | api/json-handler",
-      "GET | /^\\/downloads\\/.*$/ | files/download",
+      "GET | /^\\/downloads\\/.*$/ | files/download"
     ];
 
     expectedRoutes.forEach((route) => {
@@ -213,7 +213,7 @@ describe("the-router", () => {
       "POST | /api/v1/orders | api/v1/orders/create",
 
       "GET | /api/v2/products | api/v2/products/list",
-      "GET | /api/v2/special-\\w+/ | api/v2/special-handler",
+      "GET | /api/v2/special-\\w+/ | api/v2/special-handler"
     ];
 
     expectedRoutes.forEach((route) => {

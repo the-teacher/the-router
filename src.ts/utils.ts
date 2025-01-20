@@ -84,7 +84,7 @@ export const loadAction = (actionPath: string) => {
       res.status(501).json({
         error: "Action loading failed",
         message: "Failed to load the specified action",
-        details: error instanceof Error ? error.message : "Unknown error",
+        details: error instanceof Error ? error.message : "Unknown error"
       });
     }
   };

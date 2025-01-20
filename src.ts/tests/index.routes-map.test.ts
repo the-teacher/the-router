@@ -5,7 +5,7 @@ import {
   post,
   setActionsPath,
   resetRouter,
-  routeScope as scope,
+  routeScope as scope
 } from "../index";
 import { getRoutesMap } from "../base";
 

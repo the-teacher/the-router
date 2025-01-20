@@ -10,13 +10,13 @@ export const perform = (req: Request, res: Response) => {
       id,
       name,
       email,
-      message: `User ${id} updated`,
+      message: `User ${id} updated`
     });
   }
 
   // Для остальных методов (PUT, PATCH, DELETE)
   res.status(200).json({
     id,
-    message: `User ${id} updated via ${req.method}`,
+    message: `User ${id} updated via ${req.method}`
   });
 };

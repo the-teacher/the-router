@@ -8,7 +8,7 @@ import {
   routeScope,
   getScopeMiddlewares,
   setRouterOptions,
-  addRouteToMap,
+  addRouteToMap
 } from "./base";
 
 import { loadAction } from "./utils";
@@ -67,8 +67,8 @@ const createRouteHandler =
       urlPath instanceof RegExp
         ? urlPath
         : urlPath.startsWith("/")
-        ? urlPath
-        : `/${urlPath}`;
+          ? urlPath
+          : `/${urlPath}`;
 
     // Add all routes to map, including RegExp routes
     addRouteToMap(method, urlPath, finalActionPath, handlers);
@@ -141,7 +141,7 @@ export const resources = (
     "show",
     "edit",
     "update",
-    "destroy",
+    "destroy"
   ];
 
   // Determine which actions to create
@@ -235,5 +235,5 @@ export {
   setActionsPath,
   resetRouter,
   routeScope,
-  setRouterOptions,
+  setRouterOptions
 };

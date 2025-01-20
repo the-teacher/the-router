@@ -7,7 +7,7 @@ import {
   resetRouter,
   routeScope as scope,
   get,
-  post,
+  post
 } from "../index";
 
 describe("Scoped routes", () => {
@@ -119,7 +119,7 @@ describe("Nested scoped routes", () => {
     const responses = await Promise.all([
       request(app).get("/api/v1/invalid"),
       request(app).get("/api/v1/admin/invalid"),
-      request(app).get("/api/v3/users"),
+      request(app).get("/api/v3/users")
     ]);
 
     responses.forEach((response) => {

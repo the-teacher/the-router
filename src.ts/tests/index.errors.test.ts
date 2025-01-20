@@ -7,7 +7,7 @@ import {
   getRouter,
   setActionsPath,
   resetRouter,
-  routeScope as scope,
+  routeScope as scope
 } from "../index";
 
 describe("Missing Action Tests", () => {
@@ -27,7 +27,7 @@ describe("Missing Action Tests", () => {
     expect(response.body).toEqual({
       error: "Action loading failed",
       message: "Failed to load the specified action",
-      details: expect.any(String),
+      details: expect.any(String)
     });
   });
 
@@ -44,7 +44,7 @@ describe("Missing Action Tests", () => {
     expect(response.body).toEqual({
       error: "Action loading failed",
       message: "Failed to load the specified action",
-      details: expect.any(String),
+      details: expect.any(String)
     });
   });
 });

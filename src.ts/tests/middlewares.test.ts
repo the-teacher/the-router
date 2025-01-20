@@ -9,7 +9,7 @@ import {
   getRouter,
   setActionsPath,
   resetRouter,
-  scope,
+  scope
 } from "../index";
 
 import { addDataMiddleware, authMiddleware } from "./middlewares";

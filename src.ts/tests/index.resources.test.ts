@@ -7,7 +7,7 @@ import {
   getRouter,
   setActionsPath,
   resetRouter,
-  routeScope as scope,
+  routeScope as scope
 } from "../index";
 
 describe("Resource Routes", () => {

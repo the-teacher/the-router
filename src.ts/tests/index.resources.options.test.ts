@@ -119,7 +119,7 @@ describe("resources with options", () => {
     expect(response2.body).toEqual({
       action: "update",
       id: "123",
-      data: {},
+      data: {}
     });
 
     // Other routes should not exist

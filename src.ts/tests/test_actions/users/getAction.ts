@@ -4,6 +4,6 @@ export const perform = (req: Request, res: Response) => {
   const { id } = req.params;
   res.status(200).json({
     id,
-    message: `Get user ${id}`,
+    message: `Get user ${id}`
   });
 };

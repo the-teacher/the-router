@@ -126,7 +126,7 @@ const addRouteToMap = (
     method: method.toUpperCase(),
     path: pathString,
     action,
-    middlewares,
+    middlewares
   });
 };
 
@@ -147,5 +147,5 @@ export {
   routeScope,
   addRouteToMap,
   getRoutesMap,
-  type RouteInfo,
+  type RouteInfo
 };

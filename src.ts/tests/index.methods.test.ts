@@ -11,7 +11,7 @@ import {
   all,
   getRouter,
   setActionsPath,
-  resetRouter,
+  resetRouter
 } from "../index";
 
 describe("HTTP Methods", () => {

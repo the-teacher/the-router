@@ -7,7 +7,7 @@ import {
   setActionsPath,
   resetRouter,
   setRouterOptions,
-  routeScope as scope,
+  routeScope as scope
 } from "../index";
 
 describe("Router Configuration", () => {
@@ -41,7 +41,7 @@ describe("Router Configuration", () => {
     app.use((_req, res) => {
       res.status(404).json({
         error: "Not Found",
-        message: res.statusMessage || "Not Found",
+        message: res.statusMessage || "Not Found"
       });
     });
 
@@ -52,7 +52,7 @@ describe("Router Configuration", () => {
     expect(response1.body).toEqual({ action: "index" });
     expect(response2.body).toEqual({
       error: "Not Found",
-      message: "Not Found",
+      message: "Not Found"
     });
   });
 
@@ -66,7 +66,7 @@ describe("Router Configuration", () => {
     app.use((_req, res) => {
       res.status(404).json({
         error: "Not Found",
-        message: res.statusMessage || "Not Found",
+        message: res.statusMessage || "Not Found"
       });
     });
 
@@ -77,7 +77,7 @@ describe("Router Configuration", () => {
     expect(response1.body).toEqual({ action: "index" });
     expect(response2.body).toEqual({
       error: "Not Found",
-      message: "Not Found",
+      message: "Not Found"
     });
   });
 

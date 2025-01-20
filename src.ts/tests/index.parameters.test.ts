@@ -21,7 +21,7 @@ describe("Routes with parameters", () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       id: "123",
-      message: "Get user 123",
+      message: "Get user 123"
     });
   });
 
@@ -32,7 +32,7 @@ describe("Routes with parameters", () => {
 
     const userData = {
       name: "John Doe",
-      email: "john@example.com",
+      email: "john@example.com"
     };
 
     const response = await request(app).post("/users/123").send(userData);
@@ -42,7 +42,7 @@ describe("Routes with parameters", () => {
       id: "123",
       name: "John Doe",
       email: "john@example.com",
-      message: "User 123 updated",
+      message: "User 123 updated"
     });
   });
 });

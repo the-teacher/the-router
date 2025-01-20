@@ -14,7 +14,7 @@ describe("Utils", () => {
     acceptsEncodings: jest.fn(),
     acceptsLanguages: jest.fn(),
     param: jest.fn(),
-    is: jest.fn(),
+    is: jest.fn()
   });
 
   // Create a mock Response object
@@ -31,7 +31,7 @@ describe("Utils", () => {
     render: jest.fn(),
     locals: {},
     charset: "",
-    headersSent: false,
+    headersSent: false
   });
 
   beforeEach(() => {
@@ -68,7 +68,7 @@ describe("Utils", () => {
       expect(res.json).toHaveBeenCalledWith({
         error: "Action loading failed",
         message: "Failed to load the specified action",
-        details: expect.stringContaining("Action file"),
+        details: expect.stringContaining("Action file")
       });
     });
 
@@ -83,7 +83,7 @@ describe("Utils", () => {
       expect(res.json).toHaveBeenCalledWith({
         error: "Action loading failed",
         message: "Failed to load the specified action",
-        details: expect.stringContaining("must export a 'perform' function"),
+        details: expect.stringContaining("must export a 'perform' function")
       });
     });
 
@@ -112,7 +112,7 @@ describe("Utils", () => {
       expect(res.json).toHaveBeenCalledWith({
         error: "Action loading failed",
         message: "Failed to load the specified action",
-        details: "Action path cannot be empty",
+        details: "Action path cannot be empty"
       });
     });
 
@@ -127,7 +127,7 @@ describe("Utils", () => {
       expect(res.json).toHaveBeenCalledWith({
         error: "Action loading failed",
         message: "Failed to load the specified action",
-        details: "Action path cannot be empty",
+        details: "Action path cannot be empty"
       });
     });
   });
