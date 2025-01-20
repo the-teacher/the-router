@@ -1,8 +1,23 @@
 import fs from "fs";
 import path from "path";
-import { resetRouter, setActionsPath, root, get, post, scope } from "../index";
+import {
+  resetRouter,
+  setActionsPath,
+  root,
+  get,
+  post,
+  put,
+  patch,
+  destroy,
+  scope
+} from "../index";
 import { buildRoutesSchema } from "../utils";
-import { authMiddleware, addDataMiddleware } from "./middlewares";
+import {
+  authMiddleware,
+  addDataMiddleware,
+  validateMiddleware,
+  loggerMiddleware
+} from "./middlewares";
 
 describe("buildRoutesSchema", () => {
   const schemaDir = path.join(process.cwd(), "routes");
@@ -30,37 +45,59 @@ describe("buildRoutesSchema", () => {
     }
   });
 
-  test("should generate routes schema markdown file with complex routing", async () => {
+  test.only("should generate routes schema markdown file with complex nested routing", async () => {
     // Root route with middleware
-    root([addDataMiddleware], "index/index");
+    root([loggerMiddleware], "index/index");
 
-    // Basic routes
+    // Basic routes with different HTTP methods
     get("/users", "users/index");
-    post("/users", [authMiddleware], "users/create");
+    post("/users", [validateMiddleware], "users/create");
     get("/users/:id", "users/show");
+    put("/users/:id", [validateMiddleware, authMiddleware], "users/update");
+    patch("/users/:id/status", [authMiddleware], "users/update_status");
+    destroy("/users/:id", [authMiddleware], "users/delete");
 
     // Admin scope with middleware
     scope("admin", [authMiddleware], () => {
       get("dashboard", "admin/dashboard");
       post("settings", "admin/settings");
+
+      // Nested resources scope
+      scope("resources", [loggerMiddleware], () => {
+        get("stats", "admin/resources/stats");
+        post("upload", [validateMiddleware], "admin/resources/upload");
+      });
     });
 
-    // API scope with nested scopes
-    scope("api", [authMiddleware], () => {
+    // API scope with multiple nested levels and middleware combinations
+    scope("api", [loggerMiddleware], () => {
       get("status", "api/status");
+      get("health", "api/health");
 
-      scope("v1", () => {
+      scope("v1", [authMiddleware], () => {
         get("users", "api/v1/users/list");
-        post("users", "api/v1/users/create");
+        post("users", [validateMiddleware], "api/v1/users/create");
 
-        scope("admin", [authMiddleware], () => {
-          get("dashboard", [addDataMiddleware], "api/v1/admin/dashboard");
+        scope("admin", [addDataMiddleware], () => {
+          get("dashboard", "api/v1/admin/dashboard");
           post("settings", "api/v1/admin/settings");
+
+          // Deep nested scope with multiple middleware
+          scope("system", [validateMiddleware], () => {
+            get("logs", "api/v1/admin/system/logs");
+            post("backup", "api/v1/admin/system/backup");
+          });
         });
       });
 
-      scope("v2", () => {
+      scope("v2", [authMiddleware, validateMiddleware], () => {
         get("users", "api/v2/users/list");
+        post("users/batch", "api/v2/users/batch_create");
+
+        scope("analytics", [addDataMiddleware], () => {
+          get("reports", "api/v2/analytics/reports");
+          get("metrics", "api/v2/analytics/metrics");
+        });
       });
     });
 
@@ -69,48 +106,47 @@ describe("buildRoutesSchema", () => {
     // Verify file exists
     expect(fs.existsSync(schemaPath)).toBe(true);
 
-    // Verify content
+    // Read and verify content
     const content = fs.readFileSync(schemaPath, "utf8");
 
-    // Table header
+    // Verify table header
     expect(content).toContain("| Method | Path | Action | Middlewares |");
 
-    // Root route
+    // Verify root and basic routes
     expect(content).toContain("| GET | / | index/index | 1 middleware(s) |");
-
-    // Basic routes
     expect(content).toContain("| GET | /users | users/index | none |");
     expect(content).toContain(
       "| POST | /users | users/create | 1 middleware(s) |"
     );
-    expect(content).toContain("| GET | /users/:id | users/show | none |");
+    expect(content).toContain(
+      "| PUT | /users/:id | users/update | 2 middleware(s) |"
+    );
 
-    // Admin routes with middleware
+    // Verify admin routes
     expect(content).toContain(
       "| GET | /admin/dashboard | admin/dashboard | 1 middleware(s) |"
     );
     expect(content).toContain(
-      "| POST | /admin/settings | admin/settings | 1 middleware(s) |"
+      "| GET | /admin/resources/stats | admin/resources/stats | 2 middleware(s) |"
     );
 
-    // API routes
+    // Verify API v1 routes
     expect(content).toContain(
-      "| GET | /api/status | api/status | 1 middleware(s) |"
-    );
-    expect(content).toContain(
-      "| GET | /api/v1/users | api/v1/users/list | 1 middleware(s) |"
-    );
-    expect(content).toContain(
-      "| POST | /api/v1/users | api/v1/users/create | 1 middleware(s) |"
+      "| GET | /api/v1/users | api/v1/users/list | 2 middleware(s) |"
     );
     expect(content).toContain(
       "| GET | /api/v1/admin/dashboard | api/v1/admin/dashboard | 3 middleware(s) |"
     );
     expect(content).toContain(
-      "| POST | /api/v1/admin/settings | api/v1/admin/settings | 2 middleware(s) |"
+      "| GET | /api/v1/admin/system/logs | api/v1/admin/system/logs | 4 middleware(s) |"
+    );
+
+    // Verify API v2 routes
+    expect(content).toContain(
+      "| GET | /api/v2/users | api/v2/users/list | 3 middleware(s) |"
     );
     expect(content).toContain(
-      "| GET | /api/v2/users | api/v2/users/list | 1 middleware(s) |"
+      "| GET | /api/v2/analytics/reports | api/v2/analytics/reports | 4 middleware(s) |"
     );
   });
 });

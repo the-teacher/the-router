@@ -28,3 +28,20 @@ export const authMiddleware: RequestHandler = (
     res.status(401).json({ error: "Unauthorized" });
   }
 };
+
+// New middleware
+export const validateMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  next();
+};
+
+export const loggerMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  next();
+};
