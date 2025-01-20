@@ -1,6 +1,10 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 
-export const perform = (req: Request, res: Response) => {
+export const perform = (req: Request, res: Response): void => {
   const { id } = req.params;
-  res.json({ action: "update", id, data: req.body });
+  res.json({
+    action: "update",
+    id,
+    data: req.body
+  });
 };

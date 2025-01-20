@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 
-export const perform = (req: Request, res: Response) => {
-  return res.send("Hello Post!");
+export const perform = (_req: Request, res: Response): void => {
+  res.send("Hello Post!");
 };

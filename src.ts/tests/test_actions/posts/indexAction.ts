@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 
-export const perform = (req: Request, res: Response) => {
+export const perform = (_req: Request, res: Response): void => {
   res.json({ action: "index" });
 };
