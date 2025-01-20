@@ -4,9 +4,9 @@ import { getActionsPath, isCustomActionsPath } from "./base";
 import type { Request, Response } from "express";
 
 const VALID_EXTENSIONS = [".js", ".ts"];
-export const getProjectRoot = () => process.cwd();
+export const getProjectRoot = (): string => process.cwd();
 
-const validateActionsPath = (actionsPath: string) => {
+const validateActionsPath = (actionsPath: string): void => {
   if (!actionsPath) {
     throw new Error("Actions path is not set");
   }
@@ -38,7 +38,7 @@ const validateActionFile = (
   for (const ext of validExtensions) {
     const candidatePath = `${fullActionPath}${ext}`;
     if (fs.existsSync(candidatePath) && fs.lstatSync(candidatePath).isFile()) {
-      return candidatePath; // Return the valid file path
+      return candidatePath;
     }
   }
   throw new Error(`Action file ${fullActionPath} does not exist`);
@@ -47,7 +47,7 @@ const validateActionFile = (
 const validateActionModule = (
   actionModule: { perform?: unknown },
   fullActionPath: string
-) => {
+): void => {
   if (typeof actionModule.perform !== "function") {
     throw new Error(
       `Action module at ${fullActionPath} must export a 'perform' function`
@@ -55,28 +55,24 @@ const validateActionModule = (
   }
 };
 
-export const loadActionImplementation = async (actionPath: string) => {
+export const loadActionImplementation = async (
+  actionPath: string
+): Promise<(req: Request, res: Response) => void | Promise<void>> => {
   const actionsPath = getActionsPath();
 
-  // Validate actions path
   validateActionsPath(actionsPath);
-
-  // Resolve full action path without extension
   const fullActionPath = resolveFullActionPath(actionsPath, actionPath);
-
-  // Validate the file exists with a valid extension
   const validActionPath = validateActionFile(fullActionPath, VALID_EXTENSIONS);
-
-  // Import the module and validate its structure
   const actionModule = await import(validActionPath);
   validateActionModule(actionModule, validActionPath);
 
   return actionModule.perform;
 };
 
-export const loadAction = (actionPath: string) => {
-  // Return a RequestHandler function that handles the async operation
-  return async (req: Request, res: Response) => {
+export const loadAction = (
+  actionPath: string
+): ((req: Request, res: Response) => Promise<void>) => {
+  return async (req: Request, res: Response): Promise<void> => {
     try {
       const handler = await loadActionImplementation(actionPath);
       return handler(req, res);

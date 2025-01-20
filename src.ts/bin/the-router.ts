@@ -47,37 +47,12 @@ export const sync = async (options: Record<string, string>): Promise<void> => {
     console.log("Loading routes from:", routesFilePath);
 
     await import(routesFilePath);
-
-    // EXAMPLE OF ROUTES MAP
-    //
-    // Map(3) {
-    //   'GET:/' => {
-    //     method: 'GET',
-    //     path: '/',
-    //     action: 'home/index',
-    //     middlewares: [ [AsyncFunction (anonymous)] ]
-    //   },
-    //   'GET:/api/products' => {
-    //     method: 'GET',
-    //     path: '/api/products',
-    //     action: 'products/list',
-    //     middlewares: [ [AsyncFunction (anonymous)] ]
-    //   },
-    //   'POST:/api/orders' => {
-    //     method: 'POST',
-    //     path: '/api/orders',
-    //     action: 'orders/create',
-    //     middlewares: [ [AsyncFunction (anonymous)] ]
-    //   }
-    // }
-    //
     const routesMap = getRoutesMap();
 
     console.log("\nConfigured Routes:");
 
     routesMap.forEach((route, key) => {
       const [method, path] = key.split(":");
-      // console.warn(`${method} | ${path} | ${route.action}`);
       console.log(`${method} | ${path} | ${route.action}`);
     });
   } catch (error) {
@@ -86,7 +61,7 @@ export const sync = async (options: Record<string, string>): Promise<void> => {
   }
 };
 
-export const runCli = () => {
+export const runCli = (): void => {
   const command = process.argv[2];
   const options = parseArgs(process.argv);
 

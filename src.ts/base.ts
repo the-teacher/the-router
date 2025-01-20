@@ -37,7 +37,7 @@ const resetRouter = (): void => {
   isCustomPath = false;
   actionsPath = DEFAULT_ACTIONS_PATH;
   routerOptions = {};
-  routesMap = new Map(); // Reset routes map
+  routesMap = new Map();
 };
 
 const setActionsPath = (path: string): string => {

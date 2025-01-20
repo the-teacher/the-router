@@ -16,7 +16,7 @@ import { loadAction } from "./utils";
 export const root = (
   middlewares: RequestHandler[] | string,
   actionPath?: string
-) => {
+): void => {
   let handlers: RequestHandler[] = [...getScopeMiddlewares()];
   let finalActionPath: string;
 
@@ -31,20 +31,22 @@ export const root = (
   }
 
   handlers.push(loadAction(finalActionPath));
-
-  // Add route to map
   addRouteToMap("GET", "/", finalActionPath, handlers);
-
   getRouter().get("/", ...handlers);
 };
 
-const createRouteHandler =
-  (method: string) =>
-  (
+const createRouteHandler = (
+  method: string
+): ((
+  urlPath: string | RegExp,
+  middlewares: RequestHandler[] | string,
+  actionPath?: string
+) => void) => {
+  return (
     urlPath: string | RegExp,
     middlewares: RequestHandler[] | string,
     actionPath?: string
-  ) => {
+  ): void => {
     let handlers: RequestHandler[] = [...getScopeMiddlewares()];
     let finalActionPath: string;
 
@@ -70,7 +72,6 @@ const createRouteHandler =
           ? urlPath
           : `/${urlPath}`;
 
-    // Add all routes to map, including RegExp routes
     addRouteToMap(method, urlPath, finalActionPath, handlers);
 
     switch (method) {
@@ -102,6 +103,7 @@ const createRouteHandler =
         throw new Error(`Unsupported HTTP method: ${method}`);
     }
   };
+};
 
 export const get = createRouteHandler("get");
 export const post = createRouteHandler("post");
@@ -121,7 +123,7 @@ export const resources = (
   resourceName: string,
   middlewaresOrOptions?: RequestHandler[] | ResourceOptions,
   options?: ResourceOptions
-) => {
+): void => {
   let middlewares: RequestHandler[] = [];
   let resourceOptions: ResourceOptions = {};
 
