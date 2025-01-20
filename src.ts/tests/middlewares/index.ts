@@ -1,6 +1,9 @@
-import { Response, NextFunction } from "express";
+import { Response, NextFunction, Request } from "express";
 import { RequestHandler } from "express";
-import { TestRequest } from "../types";
+
+type TestRequest = Request & {
+  testData?: string;
+};
 
 // Test middleware that adds data to request
 export const addDataMiddleware = (
