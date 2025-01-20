@@ -22,12 +22,12 @@ describe("buildRoutesSchema", () => {
 
   afterEach(() => {
     // Clean up test files
-    // if (fs.existsSync(schemaPath)) {
-    //   fs.unlinkSync(schemaPath);
-    // }
-    // if (fs.existsSync(schemaDir)) {
-    //   fs.rmdirSync(schemaDir);
-    // }
+    if (fs.existsSync(schemaPath)) {
+      fs.unlinkSync(schemaPath);
+    }
+    if (fs.existsSync(schemaDir)) {
+      fs.rmdirSync(schemaDir);
+    }
   });
 
   test("should generate routes schema markdown file with complex routing", async () => {
