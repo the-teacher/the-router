@@ -98,13 +98,8 @@ const routeScope = (
   setRouterScope(originalScope);
   setScopeMiddlewares(originalScopeMiddlewares);
 
-  // Apply accumulated middlewares to the scoped router
-  const currentMiddlewares = getScopeMiddlewares();
-  if (currentMiddlewares.length > 0) {
-    getRouter().use(`/${scope}`, currentMiddlewares, scopedRouter);
-  } else {
-    getRouter().use(`/${scope}`, scopedRouter);
-  }
+  // Apply scoped router with its middlewares
+  getRouter().use(`/${scope}`, scopedRouter);
 };
 
 const addRouteToMap = (
