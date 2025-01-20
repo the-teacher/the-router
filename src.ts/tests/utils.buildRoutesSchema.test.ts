@@ -27,12 +27,12 @@ describe("buildRoutesSchema", () => {
     resetRouter();
     setActionsPath(path.join(__dirname, "./test_actions"));
     // Clean up test files if they exist
-    if (fs.existsSync(schemaPath)) {
-      fs.unlinkSync(schemaPath);
-    }
-    if (fs.existsSync(schemaDir)) {
-      fs.rmdirSync(schemaDir);
-    }
+    // if (fs.existsSync(schemaPath)) {
+    //   fs.unlinkSync(schemaPath);
+    // }
+    // if (fs.existsSync(schemaDir)) {
+    //   fs.rmdirSync(schemaDir);
+    // }
   });
 
   afterEach(() => {

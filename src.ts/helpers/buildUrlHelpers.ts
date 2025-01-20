@@ -1,4 +1,7 @@
+import fs from "fs";
+import path from "path";
 import { getRoutesMap, type RouteInfo } from "../base";
+import { getProjectRoot } from "../utils";
 
 export const buildUrlHelpers = (route: RouteInfo): string => {
   const { method, path } = route;
@@ -27,13 +30,28 @@ export const buildUrlHelpers = (route: RouteInfo): string => {
   return `export const ${functionName} = (${paramsSignature}): string => ${functionBody};`;
 };
 
-export const buildRoutesHelpers = (): string => {
+export const buildRoutesHelpers = async (): Promise<void> => {
   const routesMap = getRoutesMap();
+  const projectRoot = getProjectRoot();
+  const routesDir = path.join(projectRoot, "routes");
+  const helpersPath = path.join(routesDir, "routesHelpers.ts");
+
+  // Create routes directory if it doesn't exist
+  if (!fs.existsSync(routesDir)) {
+    fs.mkdirSync(routesDir, { recursive: true });
+  }
+
   const helperFunctions: string[] = [];
 
+  // Add imports and type declarations at the top
+  helperFunctions.push("// This file is auto-generated. Do not edit manually");
+  helperFunctions.push("");
+
+  // Generate helper functions for each route
   for (const route of routesMap.values()) {
     helperFunctions.push(buildUrlHelpers(route));
   }
 
-  return helperFunctions.join("\n\n");
+  // Write to file
+  fs.writeFileSync(helpersPath, helperFunctions.join("\n\n"), "utf8");
 };
