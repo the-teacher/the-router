@@ -5,14 +5,14 @@ const isWatch = process.argv.includes("--watch");
 
 /** @type {import('esbuild').BuildOptions} */
 const config = {
-  entryPoints: ["src.ts/index.ts", "src.ts/bin/the-router.ts"],
+  entryPoints: ["src.ts/index.ts"],
   bundle: true,
   outdir: "src",
   platform: "node",
   target: "node18",
   format: "esm", // Changed from 'cjs' to 'esm'
   sourcemap: true,
-  external: ["express"], // Exclude express from bundle
+  external: ["express"] // Exclude express from bundle
 };
 
 if (isWatch) {

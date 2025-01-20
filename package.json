@@ -19,7 +19,6 @@
     "lint:fix": "eslint src.ts --fix",
     "coverage": "jest --coverage",
     "test-all": "yarn lint && yarn format:check && yarn test",
-    "sync": "yarn build && node --trace-deprecation --trace-warnings --loader ts-node/esm src/bin/the-router.js sync --routesFile=src.ts/bin/routes.ts",
     "format": "prettier --write \"src.ts/**/*.{ts,js}\"",
     "format:check": "prettier --check \"src.ts/**/*.{ts,js}\""
   },
@@ -66,8 +65,5 @@
   },
   "dependencies": {
     "express": "^4.18.3"
-  },
-  "bin": {
-    "the-router": "./src/bin/the-router.js"
   }
 }
