@@ -39,6 +39,7 @@ export const buildRoutesHelpers = async (): Promise<void> => {
   const projectRoot = getProjectRoot();
   const routesDir = path.join(projectRoot, "routes");
   const helpersPath = path.join(routesDir, "routesHelpers.ts");
+  const buildUrlWithParamsPath = path.join(__dirname, "buildUrlWithParams.ts");
 
   if (!fs.existsSync(routesDir)) {
     fs.mkdirSync(routesDir, { recursive: true });
@@ -46,34 +47,16 @@ export const buildRoutesHelpers = async (): Promise<void> => {
 
   const helperFunctions: string[] = [];
 
-  // Add helper functions and type declarations at the top
+  // Read the helper function code
+  const helperFunctionCode = fs
+    .readFileSync(buildUrlWithParamsPath, "utf8")
+    .replace("export function", "function"); // Remove export keyword
+
+  // Add header and helper function
   helperFunctions.push(`// This file is auto-generated. Do not edit manually
 
 // Helper functions
-function buildUrlWithParams(
-  pathTemplate: string,
-  pathParams?: Record<string, string>,
-  urlParams?: Record<string, string | number | boolean>,
-  methodParam?: string
-): string {
-  const query = [];
-  if (methodParam) query.push(methodParam);
-  
-  const params = new URLSearchParams();
-  const restParams = urlParams || {};
-  
-  Object.entries(restParams).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      params.append(key, String(value));
-    }
-  });
-  
-  const paramsString = params.toString();
-  if (paramsString) query.push(paramsString);
-  
-  return \`\${pathTemplate}\${query.length ? '?' + query.join('&') : ''}\`;
-}
-
+${helperFunctionCode}
 `);
 
   // Generate helper functions for each route
