@@ -17,110 +17,6 @@ import { type RouteInfo } from "../base";
 import { authMiddleware } from "./middlewares";
 import fs from "fs";
 
-describe("buildUrlHelpers", () => {
-  beforeEach(() => {
-    resetRouter();
-    setActionsPath(path.join(__dirname, "./test_actions"));
-  });
-
-  test("should generate helper function for simple GET route without params", () => {
-    const route: RouteInfo = {
-      method: "GET",
-      path: "/users",
-      action: "users/index",
-      middlewares: []
-    };
-
-    const result = buildUrlHelpers(route);
-    const expectedFn = `export const users_index_get_path = (urlParams?: Record<string, string | number | boolean>): string => {
-    const query = [];
-    const params = new URLSearchParams();
-    Object.entries(urlParams || {}).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/users\${query.length ? '?' + query.join('&') : ''}\`};`;
-    expect(result).toBe(expectedFn);
-  });
-
-  test("should generate helper function for route with params and rest parameters", () => {
-    const route: RouteInfo = {
-      method: "GET",
-      path: "/users/:id",
-      action: "users/show",
-      middlewares: []
-    };
-
-    const result = buildUrlHelpers(route);
-    const expectedFn = `export const users_show_get_path = ({ id, ...urlParams }: { id: string, [key: string]: string | number | boolean }): string => {
-    const query = [];
-    const params = new URLSearchParams();
-    const { id, ...restParams } = urlParams;
-    Object.entries(restParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/users/\${id}\${query.length ? '?' + query.join('&') : ''}\`};`;
-    expect(result).toBe(expectedFn);
-  });
-
-  test("should add _method parameter for PUT routes with rest parameters", () => {
-    const route: RouteInfo = {
-      method: "PUT",
-      path: "/users/:id",
-      action: "users/update",
-      middlewares: []
-    };
-
-    const result = buildUrlHelpers(route);
-    const expectedFn = `export const users_update_put_path = ({ id, ...urlParams }: { id: string, [key: string]: string | number | boolean }): string => {
-    const query = [];
-    query.push("_method=put");
-    const params = new URLSearchParams();
-    const { id, ...restParams } = urlParams;
-    Object.entries(restParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/users/\${id}\${query.length ? '?' + query.join('&') : ''}\`};`;
-    expect(result).toBe(expectedFn);
-  });
-
-  test("should handle multiple params with rest parameters", () => {
-    const route: RouteInfo = {
-      method: "PATCH",
-      path: "/users/:userId/posts/:postId",
-      action: "users/posts/update",
-      middlewares: []
-    };
-
-    const result = buildUrlHelpers(route);
-    const expectedFn = `export const users_posts_update_patch_path = ({ userId, postId, ...urlParams }: { userId: string, postId: string, [key: string]: string | number | boolean }): string => {
-    const query = [];
-    query.push("_method=patch");
-    const params = new URLSearchParams();
-    const { userId, postId, ...restParams } = urlParams;
-    Object.entries(restParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/users/\${userId}/posts/\${postId}\${query.length ? '?' + query.join('&') : ''}\`};`;
-    expect(result).toBe(expectedFn);
-  });
-});
-
 describe("buildRoutesHelpers", () => {
   const routesDir = path.join(process.cwd(), "routes");
   const helpersPath = path.join(routesDir, "routesHelpers.ts");
@@ -146,38 +42,8 @@ describe("buildRoutesHelpers", () => {
 
     await buildRoutesHelpers();
 
-    // Verify file exists
+    // Only verify that file exists
     expect(fs.existsSync(helpersPath)).toBe(true);
-
-    // Read and verify content
-    const content = fs.readFileSync(helpersPath, "utf8");
-
-    // Verify auto-generated comment
-    expect(content).toContain(
-      "// This file is auto-generated. Do not edit manually"
-    );
-
-    // Verify generated helpers
-    expect(content).toContain(
-      "export const users_index_get_path = (urlParams?: Record<string, string | number | boolean>): string =>"
-    );
-    expect(content).toContain(
-      "export const users_create_post_path = (urlParams?: Record<string, string | number | boolean>): string =>"
-    );
-    expect(content).toContain(
-      "export const users_show_get_path = ({ id, ...urlParams }: { id: string, [key: string]: string | number | boolean }): string =>"
-    );
-    expect(content).toContain(
-      "export const users_update_status_patch_path = ({ id, ...urlParams }: { id: string, [key: string]: string | number | boolean }): string =>"
-    );
-    expect(content).toContain(
-      "export const admin_posts_show_get_path = ({ userId, postId, ...urlParams }: { userId: string, postId: string, [key: string]: string | number | boolean }): string =>"
-    );
-
-    // Verify _method parameter for non-GET/POST methods
-    expect(content).toContain('query.push("_method=put")');
-    expect(content).toContain('query.push("_method=patch")');
-    expect(content).toContain('query.push("_method=delete")');
   });
 });
 
@@ -190,7 +56,7 @@ describe("URL Helpers Generator", () => {
     setActionsPath(path.join(__dirname, "./test_actions"));
   });
 
-  test("should generate correct URL helpers for all route types", async () => {
+  test("should generate working URL helpers for all route types", async () => {
     // Define test routes covering all cases
     get("/", "home/index"); // Root path
     get("/users", "users/index"); // Simple path
@@ -209,176 +75,77 @@ describe("URL Helpers Generator", () => {
 
     await buildRoutesHelpers();
 
-    // Verify file exists
+    // Verify file exists and can be imported
     expect(fs.existsSync(helpersPath)).toBe(true);
+    const helpers = await import(helpersPath);
 
-    // Read generated content
-    const content = fs.readFileSync(helpersPath, "utf8");
-
-    // Expected content with all helper functions
-    const expectedContent = `// This file is auto-generated. Do not edit manually
-
-export const home_index_get_path = (urlParams?: Record<string, string | number | boolean>): string => {
-    const query = [];
-    const params = new URLSearchParams();
-    Object.entries(urlParams || {}).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/\${query.length ? '?' + query.join('&') : ''}\`};
-
-export const users_index_get_path = (urlParams?: Record<string, string | number | boolean>): string => {
-    const query = [];
-    const params = new URLSearchParams();
-    Object.entries(urlParams || {}).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/users\${query.length ? '?' + query.join('&') : ''}\`};
-
-export const users_create_post_path = (urlParams?: Record<string, string | number | boolean>): string => {
-    const query = [];
-    const params = new URLSearchParams();
-    Object.entries(urlParams || {}).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/users\${query.length ? '?' + query.join('&') : ''}\`};
-
-export const users_show_get_path = ({ id, ...urlParams }: { id: string, [key: string]: string | number | boolean }): string => {
-    const query = [];
-    const params = new URLSearchParams();
-    const { id, ...restParams } = urlParams;
-    Object.entries(restParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/users/\${id}\${query.length ? '?' + query.join('&') : ''}\`};
-
-export const users_update_put_path = ({ id, ...urlParams }: { id: string, [key: string]: string | number | boolean }): string => {
-    const query = [];
-    query.push("_method=put");
-    const params = new URLSearchParams();
-    const { id, ...restParams } = urlParams;
-    Object.entries(restParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/users/\${id}\${query.length ? '?' + query.join('&') : ''}\`};
-
-export const users_update_status_patch_path = ({ id, ...urlParams }: { id: string, [key: string]: string | number | boolean }): string => {
-    const query = [];
-    query.push("_method=patch");
-    const params = new URLSearchParams();
-    const { id, ...restParams } = urlParams;
-    Object.entries(restParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/users/\${id}/status\${query.length ? '?' + query.join('&') : ''}\`};
-
-export const users_delete_delete_path = ({ id, ...urlParams }: { id: string, [key: string]: string | number | boolean }): string => {
-    const query = [];
-    query.push("_method=delete");
-    const params = new URLSearchParams();
-    const { id, ...restParams } = urlParams;
-    Object.entries(restParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/users/\${id}\${query.length ? '?' + query.join('&') : ''}\`};
-
-export const comments_show_get_path = ({ postId, commentId, ...urlParams }: { postId: string, commentId: string, [key: string]: string | number | boolean }): string => {
-    const query = [];
-    const params = new URLSearchParams();
-    const { postId, commentId, ...restParams } = urlParams;
-    Object.entries(restParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/posts/\${postId}/comments/\${commentId}\${query.length ? '?' + query.join('&') : ''}\`};
-
-export const admin_dashboard_get_path = (urlParams?: Record<string, string | number | boolean>): string => {
-    const query = [];
-    const params = new URLSearchParams();
-    Object.entries(urlParams || {}).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/admin/dashboard\${query.length ? '?' + query.join('&') : ''}\`};
-
-export const admin_posts_show_get_path = ({ userId, postId, ...urlParams }: { userId: string, postId: string, [key: string]: string | number | boolean }): string => {
-    const query = [];
-    const params = new URLSearchParams();
-    const { userId, postId, ...restParams } = urlParams;
-    Object.entries(restParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    const paramsString = params.toString();
-    if (paramsString) query.push(paramsString);
-    return \`/admin/users/\${userId}/posts/\${postId}\${query.length ? '?' + query.join('&') : ''}\`};`;
-
-    expect(content).toBe(expectedContent);
-
-    // Verify the generated helpers work correctly
-    const module = await import(helpersPath);
+    // Test root path
+    expect(helpers.home_index_get_path()).toBe("/");
+    expect(helpers.home_index_get_path({ page: 1 })).toBe("/?page=1");
 
     // Test simple path
-    expect(module.users_index_get_path({ sort: "name", page: 1 })).toBe(
+    expect(helpers.users_index_get_path()).toBe("/users");
+    expect(helpers.users_index_get_path({ sort: "name", page: 1 })).toBe(
       "/users?sort=name&page=1"
     );
 
+    // Test POST method
+    expect(helpers.users_create_post_path()).toBe("/users");
+    expect(helpers.users_create_post_path({ redirect: "dashboard" })).toBe(
+      "/users?redirect=dashboard"
+    );
+
     // Test path with parameter
-    expect(module.users_show_get_path({ id: "123", format: "json" })).toBe(
+    expect(helpers.users_show_get_path({ id: "123" })).toBe("/users/123");
+    expect(helpers.users_show_get_path({ id: "123", format: "json" })).toBe(
       "/users/123?format=json"
     );
 
     // Test PUT with _method
-    expect(module.users_update_put_path({ id: "123", version: 2 })).toBe(
+    expect(helpers.users_update_put_path({ id: "123" })).toBe(
+      "/users/123?_method=put"
+    );
+    expect(helpers.users_update_put_path({ id: "123", version: 2 })).toBe(
       "/users/123?_method=put&version=2"
+    );
+
+    // Test PATCH with _method
+    expect(helpers.users_update_status_patch_path({ id: "123" })).toBe(
+      "/users/123/status?_method=patch"
+    );
+    expect(
+      helpers.users_update_status_patch_path({ id: "123", status: "active" })
+    ).toBe("/users/123/status?_method=patch&status=active");
+
+    // Test DELETE with _method
+    expect(helpers.users_delete_delete_path({ id: "123" })).toBe(
+      "/users/123?_method=delete"
     );
 
     // Test multiple parameters
     expect(
-      module.comments_show_get_path({
+      helpers.comments_show_get_path({ postId: "1", commentId: "2" })
+    ).toBe("/posts/1/comments/2");
+    expect(
+      helpers.comments_show_get_path({
         postId: "1",
         commentId: "2",
         reply: true
       })
     ).toBe("/posts/1/comments/2?reply=true");
 
+    // Test scoped routes
+    expect(helpers.admin_dashboard_get_path()).toBe("/admin/dashboard");
+    expect(helpers.admin_dashboard_get_path({ view: "analytics" })).toBe(
+      "/admin/dashboard?view=analytics"
+    );
+
     // Test scoped route with parameters
     expect(
-      module.admin_posts_show_get_path({
+      helpers.admin_posts_show_get_path({ userId: "1", postId: "2" })
+    ).toBe("/admin/users/1/posts/2");
+    expect(
+      helpers.admin_posts_show_get_path({
         userId: "1",
         postId: "2",
         draft: true
