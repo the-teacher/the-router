@@ -10,14 +10,14 @@ import {
   patch,
   destroy,
   scope
-} from "../index";
-import { buildRoutesSchema } from "../helpers/buildRoutesSchema";
+} from "../../index";
+import { buildRoutesSchema } from "../../helpers/buildRoutesSchema";
 import {
   authMiddleware,
   addDataMiddleware,
   validateMiddleware,
   loggerMiddleware
-} from "./middlewares";
+} from "../middlewares";
 
 describe("buildRoutesSchema", () => {
   const schemaDir = path.join(process.cwd(), "routes");

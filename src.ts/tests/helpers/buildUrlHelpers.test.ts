@@ -8,9 +8,9 @@ import {
   patch,
   destroy,
   scope
-} from "../index";
-import { buildRoutesHelpers } from "../helpers/buildUrlHelpers";
-import { authMiddleware } from "./middlewares";
+} from "../../index";
+import { buildRoutesHelpers } from "../../helpers/buildUrlHelpers";
+import { authMiddleware } from "../middlewares";
 import fs from "fs";
 
 describe("buildRoutesHelpers", () => {

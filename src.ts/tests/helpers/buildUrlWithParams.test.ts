@@ -1,4 +1,4 @@
-import { buildUrlWithParams } from "../helpers/buildUrlWithParams";
+import { buildUrlWithParams } from "../../helpers/buildUrlWithParams";
 
 describe("buildUrlWithParams", () => {
   test("should build basic URL without parameters", () => {
