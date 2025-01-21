@@ -52,100 +52,152 @@ describe("URL Helpers Generator", () => {
     setActionsPath(path.join(__dirname, "./test_actions"));
   });
 
-  test("should generate working URL helpers for all route types", async () => {
-    // Define test routes covering all cases
+  test("should generate working URL helpers for all route scenarios", async () => {
+    // Define routes covering all scenarios
     get("/", "home/index"); // Root path
     get("/users", "users/index"); // Simple path
-    post("/users", "users/create"); // POST method
-    get("/users/:id", "users/show"); // Path with parameter
-    put("/users/:id", "users/update"); // PUT with _method
-    patch("/users/:id/status", "users/update_status"); // PATCH with _method
-    destroy("/users/:id", "users/delete"); // DELETE with _method
-    get("/posts/:postId/comments/:commentId", "comments/show"); // Multiple parameters
+    post("/users", "users/create"); // Basic POST
+    get("/users/:id", "users/show"); // Simple path param
+    put("/users/:id", "users/update"); // PUT with method param
+    patch("/users/:id/status", "users/update_status"); // PATCH with method param
+    destroy("/users/:id", "users/delete"); // DELETE with method param
+    get("/posts/:postId/comments/:commentId", "comments/show"); // Multiple params
 
-    // Nested routes
+    // Complex nested routes
+    get(
+      "/api/v1/organizations/:orgId/projects/:projectId/tasks/:taskId",
+      "tasks/show"
+    );
+    post(
+      "/api/v1/organizations/:orgId/invites",
+      "organizations/invites/create"
+    );
+    put(
+      "/api/v1/teams/:teamId/members/:userId/role",
+      "teams/members/update_role"
+    );
+    patch(
+      "/workspaces/:workspaceId/settings/:settingId",
+      "workspaces/settings/update"
+    );
+
+    // Routes with special characters
+    get("/search/:query/page/:page", "search/results");
+    get("/reports/:reportId/export/:format", "reports/export");
+    post(
+      "/items/:itemId/tags/:tagId/versions/:versionId",
+      "items/tags/versions/create"
+    );
+
+    // Scoped routes
     scope("admin", [authMiddleware], () => {
-      get("dashboard", "admin/dashboard"); // Scoped route
-      get("users/:userId/posts/:postId", "admin/posts/show"); // Scoped with parameters
+      get("dashboard", "admin/dashboard");
+      get("users/:userId/posts/:postId", "admin/posts/show");
+      patch(
+        "organizations/:orgId/settings",
+        "admin/organizations/update_settings"
+      );
     });
 
     await buildRoutesHelpers();
-
-    // Verify file exists and can be imported
-    expect(fs.existsSync(helpersPath)).toBe(true);
     const helpers = await import(helpersPath);
 
-    // Test root path
+    // Test basic routes
     expect(helpers.home_index_get_path()).toBe("/");
     expect(helpers.home_index_get_path({ page: 1 })).toBe("/?page=1");
-
-    // Test simple path
-    expect(helpers.users_index_get_path()).toBe("/users");
-    expect(helpers.users_index_get_path({ sort: "name", page: 1 })).toBe(
-      "/users?sort=name&page=1"
+    expect(helpers.users_index_get_path({ sort: "name" })).toBe(
+      "/users?sort=name"
     );
-
-    // Test POST method
-    expect(helpers.users_create_post_path()).toBe("/users");
     expect(helpers.users_create_post_path({ redirect: "dashboard" })).toBe(
       "/users?redirect=dashboard"
     );
 
-    // Test path with parameter
+    // Test routes with path parameters
     expect(helpers.users_show_get_path({ id: "123" })).toBe("/users/123");
     expect(helpers.users_show_get_path({ id: "123", format: "json" })).toBe(
       "/users/123?format=json"
     );
 
-    // Test PUT with _method
-    expect(helpers.users_update_put_path({ id: "123" })).toBe(
-      "/users/123?_method=put"
-    );
+    // Test routes with method parameters
     expect(helpers.users_update_put_path({ id: "123", version: 2 })).toBe(
       "/users/123?_method=put&version=2"
-    );
-
-    // Test PATCH with _method
-    expect(helpers.users_update_status_patch_path({ id: "123" })).toBe(
-      "/users/123/status?_method=patch"
     );
     expect(
       helpers.users_update_status_patch_path({ id: "123", status: "active" })
     ).toBe("/users/123/status?_method=patch&status=active");
-
-    // Test DELETE with _method
-    expect(helpers.users_delete_delete_path({ id: "123" })).toBe(
-      "/users/123?_method=delete"
+    expect(helpers.users_delete_delete_path({ id: "123", force: true })).toBe(
+      "/users/123?_method=delete&force=true"
     );
 
-    // Test multiple parameters
+    // Test deeply nested routes
     expect(
-      helpers.comments_show_get_path({ postId: "1", commentId: "2" })
-    ).toBe("/posts/1/comments/2");
-    expect(
-      helpers.comments_show_get_path({
-        postId: "1",
-        commentId: "2",
-        reply: true
+      helpers.tasks_show_get_path({
+        orgId: "org_123",
+        projectId: "proj_456",
+        taskId: "task_789",
+        include: "comments",
+        version: "2"
       })
-    ).toBe("/posts/1/comments/2?reply=true");
+    ).toBe(
+      "/api/v1/organizations/org_123/projects/proj_456/tasks/task_789?include=comments&version=2"
+    );
+
+    // Test routes with various parameter types
+    expect(
+      helpers.workspaces_settings_update_patch_path({
+        workspaceId: "ws_123",
+        settingId: "setting_456",
+        enabled: true,
+        threshold: 42,
+        notify: false
+      })
+    ).toBe(
+      "/workspaces/ws_123/settings/setting_456?_method=patch&enabled=true&threshold=42&notify=false"
+    );
+
+    // Test special characters handling
+    expect(
+      helpers.reports_export_get_path({
+        reportId: "report@123",
+        format: "csv+json",
+        delimiter: ";"
+      })
+    ).toBe("/reports/report%40123/export/csv%2Bjson?delimiter=%3B");
+
+    expect(
+      helpers.items_tags_versions_create_post_path({
+        itemId: "item#123",
+        tagId: "tag&456",
+        versionId: "v1.0",
+        status: "in progress",
+        priority: "high!",
+        labels: "bug,feature"
+      })
+    ).toBe(
+      "/items/item%23123/tags/tag%26456/versions/v1.0?status=in+progress&priority=high%21&labels=bug%2Cfeature"
+    );
 
     // Test scoped routes
-    expect(helpers.admin_dashboard_get_path()).toBe("/admin/dashboard");
     expect(helpers.admin_dashboard_get_path({ view: "analytics" })).toBe(
       "/admin/dashboard?view=analytics"
     );
 
-    // Test scoped route with parameters
-    expect(
-      helpers.admin_posts_show_get_path({ userId: "1", postId: "2" })
-    ).toBe("/admin/users/1/posts/2");
     expect(
       helpers.admin_posts_show_get_path({
-        userId: "1",
-        postId: "2",
+        userId: "user_1",
+        postId: "post_2",
         draft: true
       })
-    ).toBe("/admin/users/1/posts/2?draft=true");
+    ).toBe("/admin/users/user_1/posts/post_2?draft=true");
+
+    expect(
+      helpers.admin_organizations_update_settings_patch_path({
+        orgId: "org_789",
+        theme: "dark",
+        notifications: true
+      })
+    ).toBe(
+      "/admin/organizations/org_789/settings?_method=patch&theme=dark&notifications=true"
+    );
   });
 });
