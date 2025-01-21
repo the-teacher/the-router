@@ -61,14 +61,20 @@ export const buildRoutesHelpers = async (): Promise<void> => {
   const helperFunctions: string[] = [];
 
   // Add imports and type declarations at the top
-  helperFunctions.push("// This file is auto-generated. Do not edit manually");
-  helperFunctions.push("");
+  helperFunctions.push(
+    "// This file is auto-generated. Do not edit manually\n"
+  );
 
   // Generate helper functions for each route
-  for (const route of routesMap.values()) {
-    helperFunctions.push(buildUrlHelpers(route));
+  const routes = Array.from(routesMap.values());
+  for (let i = 0; i < routes.length; i++) {
+    helperFunctions.push(buildUrlHelpers(routes[i]));
+    // Add newline after each function except the last one
+    if (i < routes.length - 1) {
+      helperFunctions.push("");
+    }
   }
 
   // Write to file
-  fs.writeFileSync(helpersPath, helperFunctions.join("\n\n"), "utf8");
+  fs.writeFileSync(helpersPath, helperFunctions.join("\n"), "utf8");
 };
