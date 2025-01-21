@@ -1,7 +1,7 @@
 /**
  * Encodes a path parameter, ensuring all special characters are properly encoded.
  */
-function encodePathParam(value: string): string {
+export function encodePathParam(value: string): string {
   return String(value)
     .split("/")
     .map((segment) =>
@@ -16,7 +16,7 @@ function encodePathParam(value: string): string {
 /**
  * Replaces placeholders in the path template with actual values.
  */
-function replacePathParams(
+export function replacePathParams(
   pathTemplate: string,
   pathParams: Record<string, string>
 ): string {
@@ -37,7 +37,7 @@ function replacePathParams(
 /**
  * Builds query string from the given URL parameters.
  */
-function buildQueryString(
+export function buildQueryString(
   urlParams?: Record<string, string | number | boolean | undefined | null>,
   methodParam?: string
 ): string {

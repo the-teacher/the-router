@@ -50,7 +50,8 @@ export const buildRoutesHelpers = async (): Promise<void> => {
   // Read the helper function code
   const helperFunctionCode = fs
     .readFileSync(buildUrlWithParamsPath, "utf8")
-    .replace("export function", "function"); // Remove export keyword
+    // remove export keyword (all lines)
+    .replace(/export function/g, "function");
 
   // Add header and helper function
   helperFunctions.push(`// This file is auto-generated. Do not edit manually
