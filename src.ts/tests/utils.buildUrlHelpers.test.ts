@@ -23,7 +23,7 @@ describe("buildUrlHelpers", () => {
     setActionsPath(path.join(__dirname, "./test_actions"));
   });
 
-  test("should generate helper function for simple route without params", () => {
+  test("should generate helper function for simple GET route without params", () => {
     const route: RouteInfo = {
       method: "GET",
       path: "/users",
@@ -32,12 +32,21 @@ describe("buildUrlHelpers", () => {
     };
 
     const result = buildUrlHelpers(route);
-    expect(result).toBe(
-      "export const users_index_get_path = (): string => `/users`;"
-    );
+    const expectedFn = `export const users_index_get_path = (urlParams?: Record<string, string | number | boolean>): string => {
+    const query = [];
+    const params = new URLSearchParams();
+    Object.entries(urlParams || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        params.append(key, String(value));
+      }
+    });
+    const paramsString = params.toString();
+    if (paramsString) query.push(paramsString);
+    return \`/users\${query.length ? '?' + query.join('&') : ''}\`};`;
+    expect(result).toBe(expectedFn);
   });
 
-  test("should generate helper function for route with params", () => {
+  test("should generate helper function for route with params and rest parameters", () => {
     const route: RouteInfo = {
       method: "GET",
       path: "/users/:id",
@@ -46,37 +55,69 @@ describe("buildUrlHelpers", () => {
     };
 
     const result = buildUrlHelpers(route);
-    expect(result).toBe(
-      "export const users_show_get_path = ({ id }: Record<string, string>): string => `/users/${id}`;"
-    );
+    const expectedFn = `export const users_show_get_path = ({ id, ...urlParams }: { id: string, [key: string]: string | number | boolean }): string => {
+    const query = [];
+    const params = new URLSearchParams();
+    const { id, ...restParams } = urlParams;
+    Object.entries(restParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        params.append(key, String(value));
+      }
+    });
+    const paramsString = params.toString();
+    if (paramsString) query.push(paramsString);
+    return \`/users/\${id}\${query.length ? '?' + query.join('&') : ''}\`};`;
+    expect(result).toBe(expectedFn);
   });
 
-  test("should generate helper function for route with multiple params", () => {
+  test("should add _method parameter for PUT routes with rest parameters", () => {
     const route: RouteInfo = {
       method: "PUT",
+      path: "/users/:id",
+      action: "users/update",
+      middlewares: []
+    };
+
+    const result = buildUrlHelpers(route);
+    const expectedFn = `export const users_update_put_path = ({ id, ...urlParams }: { id: string, [key: string]: string | number | boolean }): string => {
+    const query = [];
+    query.push("_method=put");
+    const params = new URLSearchParams();
+    const { id, ...restParams } = urlParams;
+    Object.entries(restParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        params.append(key, String(value));
+      }
+    });
+    const paramsString = params.toString();
+    if (paramsString) query.push(paramsString);
+    return \`/users/\${id}\${query.length ? '?' + query.join('&') : ''}\`};`;
+    expect(result).toBe(expectedFn);
+  });
+
+  test("should handle multiple params with rest parameters", () => {
+    const route: RouteInfo = {
+      method: "PATCH",
       path: "/users/:userId/posts/:postId",
       action: "users/posts/update",
       middlewares: []
     };
 
     const result = buildUrlHelpers(route);
-    expect(result).toBe(
-      "export const users_posts_update_put_path = ({ userId, postId }: Record<string, string>): string => `/users/${userId}/posts/${postId}`;"
-    );
-  });
-
-  test("should add _method=patch query parameter for PATCH routes", () => {
-    const route: RouteInfo = {
-      method: "PATCH",
-      path: "/users/:id/status",
-      action: "users/update_status",
-      middlewares: []
-    };
-
-    const result = buildUrlHelpers(route);
-    expect(result).toBe(
-      "export const users_update_status_patch_path = ({ id }: Record<string, string>): string => `/users/${id}/status?_method=patch`;"
-    );
+    const expectedFn = `export const users_posts_update_patch_path = ({ userId, postId, ...urlParams }: { userId: string, postId: string, [key: string]: string | number | boolean }): string => {
+    const query = [];
+    query.push("_method=patch");
+    const params = new URLSearchParams();
+    const { userId, postId, ...restParams } = urlParams;
+    Object.entries(restParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        params.append(key, String(value));
+      }
+    });
+    const paramsString = params.toString();
+    if (paramsString) query.push(paramsString);
+    return \`/users/\${userId}/posts/\${postId}\${query.length ? '?' + query.join('&') : ''}\`};`;
+    expect(result).toBe(expectedFn);
   });
 });
 
@@ -87,17 +128,6 @@ describe("buildRoutesHelpers", () => {
   beforeEach(() => {
     resetRouter();
     setActionsPath(path.join(__dirname, "./test_actions"));
-    // Clean up test file if it exists
-    // if (fs.existsSync(helpersPath)) {
-    //   fs.unlinkSync(helpersPath);
-    // }
-  });
-
-  afterEach(() => {
-    // Clean up test file
-    // if (fs.existsSync(helpersPath)) {
-    //   fs.unlinkSync(helpersPath);
-    // }
   });
 
   test("should generate helpers file with all route helper functions", async () => {
@@ -129,19 +159,24 @@ describe("buildRoutesHelpers", () => {
 
     // Verify generated helpers
     expect(content).toContain(
-      "export const users_index_get_path = (): string => `/users`;"
+      "export const users_index_get_path = (urlParams?: Record<string, string | number | boolean>): string =>"
     );
     expect(content).toContain(
-      "export const users_create_post_path = (): string => `/users`;"
+      "export const users_create_post_path = (urlParams?: Record<string, string | number | boolean>): string =>"
     );
     expect(content).toContain(
-      "export const users_show_get_path = ({ id }: Record<string, string>): string => `/users/${id}`;"
+      "export const users_show_get_path = ({ id, ...urlParams }: { id: string, [key: string]: string | number | boolean }): string =>"
     );
     expect(content).toContain(
-      "export const users_update_status_patch_path = ({ id }: Record<string, string>): string => `/users/${id}/status?_method=patch`;"
+      "export const users_update_status_patch_path = ({ id, ...urlParams }: { id: string, [key: string]: string | number | boolean }): string =>"
     );
     expect(content).toContain(
-      "export const admin_posts_show_get_path = ({ userId, postId }: Record<string, string>): string => `/admin/users/${userId}/posts/${postId}`;"
+      "export const admin_posts_show_get_path = ({ userId, postId, ...urlParams }: { userId: string, postId: string, [key: string]: string | number | boolean }): string =>"
     );
+
+    // Verify _method parameter for non-GET/POST methods
+    expect(content).toContain('query.push("_method=put")');
+    expect(content).toContain('query.push("_method=patch")');
+    expect(content).toContain('query.push("_method=delete")');
   });
 });

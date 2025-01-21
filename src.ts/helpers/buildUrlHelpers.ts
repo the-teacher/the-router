@@ -12,11 +12,11 @@ export const buildUrlHelpers = (route: RouteInfo): string => {
     (match) => match[1]
   );
 
-  // Create function signature
+  // Create function signature with required params and rest parameters
   const paramsSignature =
     paramNames.length > 0
-      ? `{ ${paramNames.join(", ")} }: Record<string, string>`
-      : "";
+      ? `{ ${paramNames.join(", ")}, ...urlParams }: { ${paramNames.map((p) => `${p}: string`).join(", ")}, [key: string]: string | number | boolean }`
+      : `urlParams?: Record<string, string | number | boolean>`;
 
   // Replace path parameters with template literals
   const pathWithParams = path.replace(
@@ -24,10 +24,27 @@ export const buildUrlHelpers = (route: RouteInfo): string => {
     (_, paramName) => `\${${paramName}}`
   );
 
-  // Generate function body
-  const functionBody = `\`${pathWithParams}${method.toLowerCase() === "patch" ? "?_method=patch" : ""}\``;
+  // Add _method parameter for non-GET/POST methods
+  const needsMethodParam = !["GET", "POST"].includes(method.toUpperCase());
+  const methodParam = needsMethodParam ? `_method=${method.toLowerCase()}` : "";
 
-  return `export const ${functionName} = (${paramsSignature}): string => ${functionBody};`;
+  // Generate function body with urlParams support
+  const functionBody = `
+    const query = [];${needsMethodParam ? `\n    query.push("${methodParam}");` : ""}
+    const params = new URLSearchParams();${
+      paramNames.length > 0
+        ? `\n    const { ${paramNames.join(", ")}, ...restParams } = urlParams;\n    Object.entries(restParams).forEach(([key, value]) => {`
+        : `\n    Object.entries(urlParams || {}).forEach(([key, value]) => {`
+    }
+      if (value !== undefined && value !== null) {
+        params.append(key, String(value));
+      }
+    });
+    const paramsString = params.toString();
+    if (paramsString) query.push(paramsString);
+    return \`${pathWithParams}\${query.length ? '?' + query.join('&') : ''}\``;
+
+  return `export const ${functionName} = (${paramsSignature}): string => {${functionBody}};`;
 };
 
 export const buildRoutesHelpers = async (): Promise<void> => {
