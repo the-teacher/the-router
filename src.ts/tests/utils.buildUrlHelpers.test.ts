@@ -9,11 +9,7 @@ import {
   destroy,
   scope
 } from "../index";
-import {
-  buildUrlHelpers,
-  buildRoutesHelpers
-} from "../helpers/buildUrlHelpers";
-import { type RouteInfo } from "../base";
+import { buildRoutesHelpers } from "../helpers/buildUrlHelpers";
 import { authMiddleware } from "./middlewares";
 import fs from "fs";
 
