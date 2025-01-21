@@ -18,9 +18,11 @@
     "lint": "eslint src.ts",
     "lint:fix": "eslint src.ts --fix",
     "coverage": "jest --coverage",
-    "test-all": "yarn lint && yarn format:check && yarn test",
+    "test-all": "yarn type-check && yarn lint && yarn format:check && yarn test",
     "format": "prettier --write \"src.ts/**/*.{ts,js}\"",
-    "format:check": "prettier --check \"src.ts/**/*.{ts,js}\""
+    "format:check": "prettier --check \"src.ts/**/*.{ts,js}\"",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch"
   },
   "repository": {
     "type": "git",
