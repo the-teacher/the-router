@@ -1,4 +1,4 @@
-import { buildQueryString } from "../../helpers/buildUrlWithParams";
+import { buildQueryString } from "../../helpers/buildUrlHelpers";
 
 describe("buildQueryString", () => {
   test("should return empty string for no parameters", () => {

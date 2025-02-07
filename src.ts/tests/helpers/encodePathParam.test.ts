@@ -1,4 +1,4 @@
-import { encodePathParam } from "../../helpers/buildUrlWithParams";
+import { encodePathParam } from "../../helpers/buildUrlHelpers";
 
 describe("encodePathParam", () => {
   test("should encode basic string", () => {

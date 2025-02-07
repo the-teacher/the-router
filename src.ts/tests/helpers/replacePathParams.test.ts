@@ -1,4 +1,4 @@
-import { replacePathParams } from "../../helpers/buildUrlWithParams";
+import { replacePathParams } from "../../helpers/buildUrlHelpers";
 
 describe("replacePathParams", () => {
   test("should replace single parameter", () => {
