@@ -1,5 +1,17 @@
 import { encodePathParam } from "../../helpers/buildUrlHelpers";
 
+/**
+ * Tests for path parameter encoding
+ * Verifies:
+ * - Basic string encoding
+ * - Special character handling
+ * - URL-unsafe character encoding
+ * - Path segment handling
+ * - Empty string handling
+ * - Complex parameter encoding
+ * - Multiple special character combinations
+ */
+
 describe("encodePathParam", () => {
   test("should encode basic string", () => {
     expect(encodePathParam("hello")).toBe("hello");

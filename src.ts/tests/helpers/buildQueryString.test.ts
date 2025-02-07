@@ -1,5 +1,17 @@
 import { buildQueryString } from "../../helpers/buildUrlHelpers";
 
+/**
+ * Tests for query string building functionality
+ * Verifies:
+ * - Empty query string handling
+ * - Single and multiple parameter handling
+ * - Different parameter types (boolean, string, number)
+ * - Special character encoding
+ * - Method parameter handling
+ * - Null/undefined parameter skipping
+ * - Complex query parameter combinations
+ */
+
 describe("buildQueryString", () => {
   test("should return empty string for no parameters", () => {
     expect(buildQueryString()).toBe("");

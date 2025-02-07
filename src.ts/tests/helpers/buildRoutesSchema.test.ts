@@ -19,6 +19,17 @@ import {
   loggerMiddleware
 } from "../middlewares";
 
+/**
+ * Tests for routes schema generation
+ * Verifies:
+ * - Complex nested routing documentation
+ * - Middleware documentation in schema
+ * - Different HTTP methods documentation
+ * - Scoped routes representation
+ * - Schema file generation and format
+ * - Complete routing hierarchy documentation
+ */
+
 describe("buildRoutesSchema", () => {
   const schemaDir = path.join(process.cwd(), "routes");
   const schemaPath = path.join(schemaDir, "routesSchema.md");

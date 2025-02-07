@@ -1,5 +1,17 @@
 import { buildUrlWithParams } from "../../helpers/buildUrlHelpers";
 
+/**
+ * Tests for URL construction with parameters
+ * Verifies:
+ * - Basic URL construction
+ * - Path parameter replacement
+ * - Query parameter addition
+ * - Method parameter handling
+ * - Parameter combination handling
+ * - Special character encoding in URLs
+ * - Complex URL pattern handling
+ */
+
 describe("buildUrlWithParams", () => {
   test("should build basic URL without parameters", () => {
     const url = buildUrlWithParams("/users");

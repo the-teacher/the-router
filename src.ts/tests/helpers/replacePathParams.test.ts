@@ -1,5 +1,17 @@
 import { replacePathParams } from "../../helpers/buildUrlHelpers";
 
+/**
+ * Tests for path parameter replacement functionality
+ * Verifies:
+ * - Single parameter replacement
+ * - Multiple parameter replacement
+ * - Special character handling in parameters
+ * - Multiple occurrences of same parameter
+ * - Empty parameter handling
+ * - Complex path patterns
+ * - URL encoding of parameter values
+ */
+
 describe("replacePathParams", () => {
   test("should replace single parameter", () => {
     expect(replacePathParams("/users/:id", { id: "123" })).toBe("/users/123");
