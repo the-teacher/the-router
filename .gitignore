@@ -15,7 +15,10 @@ lerna-debug.log*
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Project files
 /src
 /coverage
 /routes
 /.vscode
+/tmp
