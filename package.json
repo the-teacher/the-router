@@ -1,6 +1,6 @@
 {
   "name": "@the-teacher/the-router",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "type": "module",
   "description": "Simple router for Express.js, making routes and actions easy to manage.",
   "publishConfig": {
