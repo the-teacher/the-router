@@ -1,3 +1,13 @@
+/**
+ * Tests for route mapping functionality
+ * Verifies:
+ * - Basic route registration (GET, POST, root routes)
+ * - Scoped routes mapping
+ * - RegExp route handling
+ * - Path normalization
+ * - Router reset functionality
+ */
+
 import path from "path";
 import {
   root,

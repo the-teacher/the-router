@@ -1,3 +1,13 @@
+/**
+ * Tests for scoped routing functionality
+ * Verifies:
+ * - Basic scope routing (admin/api routes)
+ * - Nested scopes (multiple levels deep)
+ * - Different HTTP methods within scopes
+ * - Error handling for invalid scoped routes
+ * - Path construction for nested routes
+ */
+
 import path from "path";
 import express from "express";
 import request from "supertest";

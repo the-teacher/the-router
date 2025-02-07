@@ -10,6 +10,16 @@ import {
   routeScope as scope
 } from "../index";
 
+/**
+ * Tests for router configuration options
+ * Verifies:
+ * - Default router options behavior
+ * - Strict routing configuration
+ * - Case-sensitive routing configuration
+ * - Configuration inheritance in scoped routes
+ * - Router reset behavior with configurations
+ */
+
 describe("Router Configuration", () => {
   beforeEach(() => {
     resetRouter();

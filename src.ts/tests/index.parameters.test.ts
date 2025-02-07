@@ -3,6 +3,16 @@ import express from "express";
 import request from "supertest";
 import { getRouter, setActionsPath, resetRouter, get, post } from "../index";
 
+/**
+ * Tests for route parameter handling
+ * Verifies:
+ * - URL parameter extraction
+ * - Parameter passing to route handlers
+ * - Parameter combination with request body
+ * - Parameter validation and processing
+ * - Dynamic route parameter handling
+ */
+
 describe("Routes with parameters", () => {
   beforeEach(() => {
     resetRouter();

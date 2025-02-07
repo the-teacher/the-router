@@ -1,3 +1,13 @@
+/**
+ * Tests for middleware integration with routes
+ * Verifies:
+ * - Middleware application to root routes
+ * - Authentication middleware for protected routes
+ * - Scoped middleware application
+ * - Middleware chaining and combinations
+ * - Router stack structure with middlewares
+ */
+
 import express, { Request, Response, NextFunction } from "express";
 import request from "supertest";
 import path from "path";

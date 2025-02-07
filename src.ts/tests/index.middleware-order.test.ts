@@ -10,6 +10,16 @@ import {
 } from "../index";
 import type { Request, Response, NextFunction } from "express";
 
+/**
+ * Tests for middleware execution ordering
+ * Verifies:
+ * - Nested scope middleware execution order
+ * - Route-specific middleware positioning
+ * - Multiple middleware ordering at same scope
+ * - Error handling middleware chain
+ * - Parallel routes middleware execution
+ */
+
 describe("Middleware Execution Order", () => {
   // Store execution order
   let executionOrder: number[];

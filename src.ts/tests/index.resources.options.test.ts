@@ -4,6 +4,16 @@ import request from "supertest";
 import type { RequestHandler } from "express";
 import { resources, getRouter, setActionsPath, resetRouter } from "../index";
 
+/**
+ * Tests for resource routing options and customization
+ * Verifies:
+ * - Route filtering with 'only' option
+ * - Route exclusion with 'except' option
+ * - Route name conflicts and precedence
+ * - Middleware integration with resource options
+ * - Custom route configurations
+ */
+
 describe("resources with options", () => {
   beforeEach(() => {
     resetRouter();

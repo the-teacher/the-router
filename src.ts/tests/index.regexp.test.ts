@@ -4,6 +4,16 @@ import request from "supertest";
 import type { Request, Response, NextFunction } from "express";
 import { get, getRouter, setActionsPath, resetRouter } from "../index";
 
+/**
+ * Tests for RegExp-based routing
+ * Verifies:
+ * - Route matching with regular expressions
+ * - RegExp routes with middleware
+ * - Route priority and ordering
+ * - Path parameter extraction from RegExp matches
+ * - Multiple RegExp patterns handling
+ */
+
 describe("Routes with RegExp", () => {
   beforeEach(() => {
     resetRouter();

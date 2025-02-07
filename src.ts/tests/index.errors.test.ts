@@ -10,6 +10,16 @@ import {
   routeScope as scope
 } from "../index";
 
+/**
+ * Tests for error handling in routing
+ * Verifies:
+ * - Missing action file handling
+ * - Non-existent route handling
+ * - Error responses format
+ * - Scoped routes error handling
+ * - Action loading failures
+ */
+
 describe("Missing Action Tests", () => {
   beforeEach(() => {
     resetRouter();

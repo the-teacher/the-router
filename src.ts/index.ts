@@ -13,7 +13,6 @@ import {
 
 import { loadAction } from "./utils";
 import { buildRoutesSchema } from "./helpers/buildRoutesSchema";
-import { buildUrlHelpers } from "./helpers/buildUrlHelpers";
 
 export const root = (
   middlewares: RequestHandler[] | string,
@@ -240,6 +239,5 @@ export {
   resetRouter,
   routeScope,
   setRouterOptions,
-  buildRoutesSchema,
-  buildUrlHelpers
+  buildRoutesSchema
 };

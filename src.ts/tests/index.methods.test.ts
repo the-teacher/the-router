@@ -14,6 +14,16 @@ import {
   resetRouter
 } from "../index";
 
+/**
+ * Tests for HTTP method handlers
+ * Verifies:
+ * - Support for various HTTP methods (PUT, PATCH, DELETE, OPTIONS, HEAD)
+ * - ALL method handler for multiple HTTP methods
+ * - Middleware integration with different HTTP methods
+ * - Authentication and authorization for different methods
+ * - Response handling for each HTTP method
+ */
+
 describe("HTTP Methods", () => {
   beforeEach(() => {
     resetRouter();

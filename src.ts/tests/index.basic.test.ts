@@ -1,3 +1,13 @@
+/**
+ * Tests for basic routing functionality
+ * Verifies:
+ * - Root route handling
+ * - Basic GET route handling
+ * - Basic POST route handling
+ * - Router initialization
+ * - Basic response handling
+ */
+
 import path from "path";
 import express from "express";
 import request from "supertest";

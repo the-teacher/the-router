@@ -1,3 +1,13 @@
+/**
+ * Tests for RESTful resource routing
+ * Verifies:
+ * - Standard CRUD routes (index, show, new, create, edit, update, destroy)
+ * - Resource routes with middleware
+ * - Scoped resources
+ * - HTTP methods mapping (GET, POST, PUT, PATCH, DELETE)
+ * - Path parameter handling
+ */
+
 import path from "path";
 import express from "express";
 import request from "supertest";
