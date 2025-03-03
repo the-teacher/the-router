@@ -1,0 +1,29 @@
+{
+  "name": "The Router Development",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/app",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "orta.vscode-jest",
+        "github.copilot"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "eslint.validate": ["typescript"],
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "jest.autoRun": "off"
+      }
+    }
+  },
+  "postCreateCommand": "yarn install",
+  "remoteUser": "node"
+} 
