@@ -1,84 +1,80 @@
 import { Router, RequestHandler, RouterOptions } from "express";
+import {
+  RouterState,
+  RouteInfo,
+  createRouterState,
+  resetRouterState
+} from "./router-state";
 
-const DEFAULT_ACTIONS_PATH = "src/actions";
+// Global router state
+let state: RouterState = createRouterState();
 
-let router: Router | null = null;
-let currentScope: string | null = null;
-let scopeMiddlewares: RequestHandler[] = [];
-let actionsPath: string = DEFAULT_ACTIONS_PATH;
-let isCustomPath: boolean = false;
-let routerOptions: RouterOptions = {};
-
-type RouteInfo = {
-  method: string;
-  path: string;
-  action: string;
-  middlewares: RequestHandler[];
+// Router configuration functions
+/**
+ * Sets options for Express Router
+ * @param options - Router configuration options
+ */
+export const setRouterOptions = (options: RouterOptions): void => {
+  state.routerOptions = options;
 };
 
-// Add routes map
-let routesMap: Map<string, RouteInfo> = new Map();
-
-const setRouterOptions = (options: RouterOptions): void => {
-  routerOptions = options;
-};
-
-const getRouter = (): Router => {
-  if (!router) {
-    router = Router(routerOptions);
+/**
+ * Returns current router instance or creates a new one if it doesn't exist
+ * @returns Express Router instance
+ */
+export const getRouter = (): Router => {
+  if (!state.router) {
+    state.router = Router(state.routerOptions);
   }
-  return router;
+  return state.router;
 };
 
-const resetRouter = (): void => {
-  router = null;
-  currentScope = null;
-  scopeMiddlewares = [];
-  isCustomPath = false;
-  actionsPath = DEFAULT_ACTIONS_PATH;
-  routerOptions = {};
-  routesMap = new Map();
+export const resetRouter = (): void => {
+  state = resetRouterState();
 };
 
-const setActionsPath = (path: string): string => {
-  isCustomPath = true;
-  actionsPath = path;
+// Functions for working with action paths
+export const setActionsPath = (path: string): string => {
+  state.isCustomPath = true;
+  state.actionsPath = path;
   return path;
 };
 
-const isCustomActionsPath = (): boolean => isCustomPath;
-const getActionsPath = (): string => actionsPath;
+export const isCustomActionsPath = (): boolean => state.isCustomPath;
+export const getActionsPath = (): string => state.actionsPath;
 
-const setRouterScope = (scope: string | null): void => {
-  currentScope = scope;
+// Functions for working with scopes
+export const setRouterScope = (scope: string | null): void => {
+  state.currentScope = scope;
 };
 
-const getRouterScope = (): string | null => currentScope;
+export const getRouterScope = (): string | null => state.currentScope;
 
-const getScopeMiddlewares = (): RequestHandler[] => scopeMiddlewares;
+export const getScopeMiddlewares = (): RequestHandler[] =>
+  state.scopeMiddlewares;
 
-const setScopeMiddlewares = (middlewares: RequestHandler[]): void => {
-  scopeMiddlewares = middlewares;
+export const setScopeMiddlewares = (middlewares: RequestHandler[]): void => {
+  state.scopeMiddlewares = middlewares;
 };
 
-const routeScope = (
+export const routeScope = (
   scope: string,
   middlewaresOrCallback: RequestHandler[] | (() => void),
   routesDefinitionCallback?: () => void
 ): void => {
-  const scopedRouter = Router(routerOptions);
-  const originalRouter = router;
-  const originalScope = currentScope;
-  const originalScopeMiddlewares = scopeMiddlewares;
+  const scopedRouter = Router(state.routerOptions);
+  const originalRouter = state.router;
+  const originalScope = state.currentScope;
+  const originalScopeMiddlewares = state.scopeMiddlewares;
 
   // Temporarily replace global router with new scoped one
-  router = scopedRouter;
+  state.router = scopedRouter;
 
   // Set current scope
   const newScope = originalScope ? `${originalScope}/${scope}` : scope;
   setRouterScope(newScope);
 
-  // Accumulate middlewares from parent scope
+  // Process middlewares
   if (Array.isArray(middlewaresOrCallback)) {
     setScopeMiddlewares([
       ...originalScopeMiddlewares,
@@ -94,7 +90,7 @@ const routeScope = (
   }
 
   // Restore original router, scope and middlewares
-  router = originalRouter;
+  state.router = originalRouter;
   setRouterScope(originalScope);
   setScopeMiddlewares(originalScopeMiddlewares);
 
@@ -102,7 +98,8 @@ const routeScope = (
   getRouter().use(`/${scope}`, scopedRouter);
 };
 
-const addRouteToMap = (
+// Route management functions
+export const addRouteToMap = (
   method: string,
   path: string | RegExp,
   action: string,
@@ -111,22 +108,19 @@ const addRouteToMap = (
   // Convert RegExp to string if needed
   let pathString = path instanceof RegExp ? path.toString() : path;
 
-  // If we're in a scope and dealing with a RegExp, modify the RegExp pattern
-  if (currentScope && path instanceof RegExp) {
-    // Remove leading/trailing slashes from the RegExp string
+  // Process paths considering current scope
+  if (state.currentScope && path instanceof RegExp) {
     const regexStr = path.toString().replace(/^\/|\/$/g, "");
-    // Create new RegExp with scope prefix
-    pathString = `/${currentScope}/${regexStr}/`;
+    pathString = `/${state.currentScope}/${regexStr}/`;
   } else if (typeof path === "string") {
-    // Handle string paths as before
     const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-    pathString = currentScope
-      ? `/${currentScope}${normalizedPath}`
+    pathString = state.currentScope
+      ? `/${state.currentScope}${normalizedPath}`
       : normalizedPath;
   }
 
   const routeKey = `${method.toUpperCase()}:${pathString}`;
-  routesMap.set(routeKey, {
+  state.routesMap.set(routeKey, {
     method: method.toUpperCase(),
     path: pathString,
     action,
@@ -134,22 +128,6 @@ const addRouteToMap = (
   });
 };
 
-const getRoutesMap = (): Map<string, RouteInfo> => routesMap;
+export const getRoutesMap = (): Map<string, RouteInfo> => state.routesMap;
 
-// Export all functions at the end since there are more than 5 exports
-export {
-  setRouterOptions,
-  getRouter,
-  resetRouter,
-  setActionsPath,
-  isCustomActionsPath,
-  getActionsPath,
-  setRouterScope,
-  getRouterScope,
-  getScopeMiddlewares,
-  setScopeMiddlewares,
-  routeScope,
-  addRouteToMap,
-  getRoutesMap,
-  type RouteInfo
-};
+export type { RouteInfo };
